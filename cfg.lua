@@ -11,7 +11,7 @@ local mediaFolder = "Interface\\AddOns\\oUF_Fail\\media\\" -- don't touch this .
 -- Units
 cfg.showtot = true -- show target of target frame
 cfg.showpet = true -- show pet frame
-cfg.showpartypet = true -- show party pet frame
+cfg.showpartypet = false -- show party pet frame
 cfg.showfocus = true -- show focus frame
 cfg.showfocustarget = true -- show focus target frame
 cfg.ShowPlayerName = true -- show player's name and level

@@ -343,8 +343,7 @@ local function CreatePartyStyle(self)
     lib.raidDebuffs(self)
     
     self.Health.PostUpdate = lib.PostUpdateRaidFrame
-    self:RegisterEvent('PLAYER_TARGET_CHANGED', lib.ChangedTarget)
-    self:RegisterEvent('RAID_ROSTER_UPDATE', lib.ChangedTarget)
+    self:RegisterEvent('GROUP_ROSTER_UPDATE', lib.ChangedTarget)
     self:RegisterEvent("UNIT_THREAT_LIST_UPDATE", lib.UpdateThreat)
     self:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE", lib.UpdateThreat)
 end
@@ -386,7 +385,6 @@ local CreateRaidStyle = function(self, unit, isSingle)
     lib.createAuraWatch(self, unit)
     
     self.Health.PostUpdate = lib.PostUpdateRaidFrame
-    self:RegisterEvent('PLAYER_TARGET_CHANGED', lib.ChangedTarget)
     self:RegisterEvent('GROUP_ROSTER_UPDATE', lib.ChangedTarget)
     self:RegisterEvent("UNIT_THREAT_LIST_UPDATE", lib.UpdateThreat)
     self:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE", lib.UpdateThreat)
@@ -539,13 +537,16 @@ oUF:Factory(function(self)
                 --local party = oUF:SpawnHeader('oUF_Party', nil, "solo", "showSolo", true,  -- debug
                 "showParty", true,
                 "showPlayer", false,
-                'template', 'oUF_failPartyPet',
+                -- 'template', 'oUF_failPartyPet',
                 --'useOwnerUnit', true,
                 "yoffset", -20,
                 "oUF-initialConfigFunction", ([[
 			self:SetWidth(%d)
 			self:SetHeight(%d)
    		]]
+                
+                
+                
                 
                 
                 ):format(128, 26))
@@ -581,6 +582,9 @@ oUF:Factory(function(self)
 		]]
                 
                 
+                
+                
+                
                 ):format(75, 25))
             --raid25:SetScale(cfg.raidScale)
             raid25:SetPoint('TOPLEFT', UIParent, 'TOPLEFT', cfg.RaidX, cfg.RaidY)
@@ -606,6 +610,9 @@ oUF:Factory(function(self)
 		]]
                 
                 
+                
+                
+                
                 ):format(50, 25))
             --raid40:SetScale(cfg.raidScale)
             raid40:SetPoint('CENTER', UIParent, 'CENTER', cfg.RaidX + 135, cfg.RaidY)
@@ -620,6 +627,9 @@ oUF:Factory(function(self)
 				self:SetWidth(%d)
 				self:SetHeight(%d)
 			]]
+                
+                
+                
                 
                 
                 ):format(80, 22),
