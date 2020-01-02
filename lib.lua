@@ -730,7 +730,7 @@ end
 -- Post Update Icon Function
 local myPostUpdateIcon = function(self, unit, icon, index, offset, filter, isDebuff)
         
-        local _, _, _, _, _, duration, expirationTime, unitCaster, _ = UnitAura(unit, index, icon.filter)
+        local _, _, _, _, duration, expirationTime, unitCaster, _ = UnitAura(unit, index, icon.filter)
         
         if duration and duration > 0 then
             icon.time:Show()
@@ -744,7 +744,8 @@ local myPostUpdateIcon = function(self, unit, icon, index, offset, filter, isDeb
         
         -- Desaturate non-Player Debuffs
         if (icon.isDebuff) then
-            if (unit == "target") then
+        if (unit == "target") then
+            
                 if (unitCaster == 'player' or unitCaster == 'vehicle') then
                     icon.icon:SetDesaturated(false)
                 elseif (not UnitPlayerControlled(unit)) then -- If Unit is Player Controlled don't desaturate debuffs
@@ -783,7 +784,6 @@ end
 
 -- Create Buff/Debuff Timer Function
 function CreateBuffTimer(self, elapsed)
-    local currentTime = GetTime()
     self.elapsed = (self.elapsed or 0) + elapsed
     if self.elapsed >= 0.1 then
         if not self.first then
@@ -812,58 +812,6 @@ function CreateBuffTimer(self, elapsed)
     end
 end
 
-
---[[ Generates the Buffs
-lib.createBuffs = function(f)
-b = CreateFrame("Frame", nil, f)
-b.onlyShowPlayer = cfg.buffsOnlyShowPlayer
-if f.mystyle == "target" then
-b.size = 30
-b.num = 14
-b.spacing = 5
-if(playerClass == "ROGUE" or playerClass == "DRUID") then
-b:SetPoint("BOTTOMLEFT", f, "TOPLEFT", 2, 36)
-else
-b:SetPoint("BOTTOMLEFT", f, "TOPLEFT", 6, 16)
-end
-b.initialAnchor = "BOTTOMLEFT"
-b["growth-x"] = "RIGHT"
-b["growth-y"] = "UP"
-b:SetHeight((b.size+b.spacing)*4)
-b:SetWidth(f:GetWidth())
-else
-b.num = 0
-end
-b.PostCreateIcon = myPostCreateIcon
-b.PostUpdateIcon = myPostUpdateIcon
-
-f.Buffs = b
-end
-
--- Generates the Debuffs
-lib.createDebuffs = function(f)
-b = CreateFrame("Frame", nil, f)
-if f.mystyle == "tot" or f.mystyle == "focus" then
-b.onlyShowPlayer = false
-b.size = 36
-b.num = 8
-else
-b.onlyShowPlayer = cfg.debuffsOnlyShowPlayer
-b.size = 36
-b.num = 12
-end
-b.spacing = 6
-b:SetHeight((b.size+b.spacing)*5)
-b:SetWidth(f:GetWidth())
-b:SetPoint("TOPLEFT", f, "TOPRIGHT", 16, 0)
-b.initialAnchor = "TOPLEFT"
-b["growth-x"] = "RIGHT"
-b["growth-y"] = "DOWN"
-b.PostCreateIcon = myPostCreateIcon
-b.PostUpdateIcon = myPostUpdateIcon
-
-f.Debuffs = b
-end]]
 -- Generates the Buffs
 lib.createBuffs = function(f)
     b = CreateFrame("Frame", nil, f)
@@ -957,41 +905,7 @@ lib.PostUpdateRaidFrame = function(Health, unit, min, max)
         end
 end
 
-
--- Class specific powers
-lib.gen_AltPowerBar = function(self)
-        
-        local pad
-        if (IsAddOnLoaded('oUF_Experience') or IsAddOnLoaded('oUF_Reputation')) then pad = -8
-        else
-            pad = 0
-        end
-        
-        local AdditionalPower = CreateFrame("StatusBar", "AdditionalPowerBar", self.Power)
-        AdditionalPower:SetHeight(6)
-        AdditionalPower:SetWidth(self.Power:GetWidth() - 20)
-        AdditionalPower:SetPoint("TOP", self.Health, "BOTTOM", 0 - pad, -1 + pad)
-        AdditionalPower:SetFrameLevel(1)
-        AdditionalPower:SetStatusBarTexture(cfg.statusbar_texture)
-        AdditionalPower:SetStatusBarColor(.117, .55, 1)
-        
-        AdditionalPower.bg = AdditionalPower:CreateTexture(nil, "BORDER")
-        AdditionalPower.bg:SetTexture(cfg.statusbar_texture)
-        AdditionalPower.bg:SetVertexColor(.05, .15, .4)
-        AdditionalPower.bg:SetPoint("TOPLEFT", AdditionalPower, "TOPLEFT", 0, 0)
-        AdditionalPower.bg:SetPoint("BOTTOMRIGHT", AdditionalPower, "BOTTOMRIGHT", 0, 0)
-        
-        local h = CreateFrame("Frame", nil, AdditionalPower)
-        h:SetFrameLevel(0)
-        h:SetPoint("TOPLEFT", -4, 4)
-        h:SetPoint("BOTTOMRIGHT", 4, -4)
-        lib.gen_classback(h)
-        
-        self.DruidMana = AdditionalPower
-        self.DruidMana.bg = AdditionalPower.bg
-end
-
--- Runebar
+-- runebar
 lib.genRunes = function(self)
     if playerClass ~= "DEATHKNIGHT" then return end
     local Runes = CreateFrame("Frame", nil, self)
@@ -999,11 +913,11 @@ lib.genRunes = function(self)
     Runes:SetHeight(8)
     Runes:SetWidth(self.Health:GetWidth())
     
-    local pad
-    if (IsAddOnLoaded('oUF_Experience') or IsAddOnLoaded('oUF_Reputation')) then pad = -8
-    else
-        pad = 0
-    end
+    -- local pad
+    -- if (IsAddOnLoaded('oUF_Experience') or IsAddOnLoaded('oUF_Reputation')) then pad = -8
+    -- else
+    --     pad = 0
+    -- end
     
     for i = 1, 6 do
         Runes[i] = CreateFrame("StatusBar", self:GetName() .. "_Runes" .. i, self)
@@ -1025,7 +939,7 @@ lib.genRunes = function(self)
         lib.gen_classback(h)
         
         if (i == 1) then
-            Runes[i]:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", 0 - pad, -6 + pad)
+            Runes[i]:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", 0, -6)
         else
             Runes[i]:SetPoint('TOPLEFT', Runes[i - 1], 'TOPRIGHT', 1, 0)
         end
@@ -1033,14 +947,48 @@ lib.genRunes = function(self)
     
     self.Runes = Runes
 end
+
+-- Class specific powers
+lib.gen_AltPowerBar = function(self)
+        
+        -- local pad
+        -- if (IsAddOnLoaded('oUF_Experience') or IsAddOnLoaded('oUF_Reputation')) then pad = -8
+        -- else
+        --     pad = 0
+        -- end
+        
+        local AdditionalPower = CreateFrame("StatusBar", "AdditionalPowerBar", self.Power)
+        AdditionalPower:SetHeight(6)
+        AdditionalPower:SetWidth(self.Power:GetWidth() - 20)
+        AdditionalPower:SetPoint("TOP", self.Health, "BOTTOM", 0, -1)
+        AdditionalPower:SetFrameLevel(1)
+        AdditionalPower:SetStatusBarTexture(cfg.statusbar_texture)
+        AdditionalPower:SetStatusBarColor(.117, .55, 1)
+        
+        AdditionalPower.bg = AdditionalPower:CreateTexture(nil, "BORDER")
+        AdditionalPower.bg:SetTexture(cfg.statusbar_texture)
+        AdditionalPower.bg:SetVertexColor(.05, .15, .4)
+        AdditionalPower.bg:SetPoint("TOPLEFT", AdditionalPower, "TOPLEFT", 0, 0)
+        AdditionalPower.bg:SetPoint("BOTTOMRIGHT", AdditionalPower, "BOTTOMRIGHT", 0, 0)
+        
+        local h = CreateFrame("Frame", nil, AdditionalPower)
+        h:SetFrameLevel(0)
+        h:SetPoint("TOPLEFT", -4, 4)
+        h:SetPoint("BOTTOMRIGHT", 4, -4)
+        lib.gen_classback(h)
+        
+        self.DruidMana = AdditionalPower
+        self.DruidMana.bg = AdditionalPower.bg
+end
+
 -- Class Power
 lib.gen_Classbar = function(self)
         
-        local pad
-        if (IsAddOnLoaded('oUF_Experience') or IsAddOnLoaded('oUF_Reputation')) then pad = -8
-        else
-            pad = 0
-        end
+        -- local pad
+        -- if (IsAddOnLoaded('oUF_Experience') or IsAddOnLoaded('oUF_Reputation')) then pad = -8
+        -- else
+        --     pad = 0
+        -- end
         
         local maxPower, color
         if playerClass == "MAGE" then
@@ -1079,7 +1027,7 @@ lib.gen_Classbar = function(self)
                 lib.gen_classback(h)
                 
                 if (i == 1) then
-                    ClassIcons[i]:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", 0 - pad, -5 + pad)
+                    ClassIcons[i]:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", 0, -5)
                 else
                     ClassIcons[i]:SetPoint('TOPLEFT', ClassIcons[i - 1], "TOPRIGHT", 3, 0)
                 end
@@ -1093,11 +1041,11 @@ end
 lib.RogueComboPoints = function(self)
     if (playerClass == "ROGUE" or playerClass == "DRUID") then
         
-        local pad
-        if (IsAddOnLoaded('oUF_Experience') or IsAddOnLoaded('oUF_Reputation')) then pad = -8
-        else
-            pad = 0
-        end
+        -- local pad
+        -- if (IsAddOnLoaded('oUF_Experience') or IsAddOnLoaded('oUF_Reputation')) then pad = -8
+        -- else
+        --     pad = 0
+        -- end
         
         local combo = CreateFrame("Frame", nil, self)
         combo:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", 0, -5)
@@ -1123,7 +1071,7 @@ lib.RogueComboPoints = function(self)
             
             
             if (i == 1) then
-                combo[i]:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", 0 - pad, -5 + pad)
+                combo[i]:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", 0, -5)
             else
                 combo[i]:SetPoint('TOPLEFT', combo[i - 1], 'TOPRIGHT', 2, 0)
             end
