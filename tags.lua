@@ -114,7 +114,7 @@ oUF.Tags.Methods["fail:afkdnd"] = function(unit)
         
         return UnitIsAFK(unit) and "|cffCFCFCF <afk>|r" or UnitIsDND(unit) and "|cffCFCFCF <dnd>|r" or ""
 end
-oUF.Tags.Events["fail:afkdnd"] = 'PLAYER_FLAGS_CHANGED UNIT_POWER UNIT_MAXPOWER'
+oUF.Tags.Events["fail:afkdnd"] = 'PLAYER_FLAGS_CHANGED UNIT_POWER_UPDATE UNIT_MAXPOWER'
 
 oUF.Tags.Methods['fail:power'] = function(u)
     local min, max = UnitPower(u), UnitPowerMax(u)
@@ -124,7 +124,7 @@ oUF.Tags.Methods['fail:power'] = function(u)
         return SVal(max)
     end
 end
-oUF.Tags.Events['fail:power'] = 'UNIT_POWER UNIT_MAXPOWER'
+oUF.Tags.Events['fail:power'] = 'UNIT_POWER_UPDATE UNIT_MAXPOWER'
 
 oUF.Tags.Methods['fail:pp'] = function(u)
     if u == "player" or u == "target" then
@@ -134,7 +134,7 @@ oUF.Tags.Methods['fail:pp'] = function(u)
         end
     end
 end
-oUF.Tags.Events['fail:pp'] = 'UNIT_POWER UNIT_MAXPOWER'
+oUF.Tags.Events['fail:pp'] = 'UNIT_POWER_UPDATE UNIT_MAXPOWER'
 
 --oUF.Tags.Methods['fail:pp'] = function(u)
 --    if u == "player" then
@@ -144,7 +144,7 @@ oUF.Tags.Events['fail:pp'] = 'UNIT_POWER UNIT_MAXPOWER'
 --		end
 --	end
 --end
---oUF.Tags.Events['fail:pp'] = 'UNIT_POWER UNIT_MAXPOWER'
+--oUF.Tags.Events['fail:pp'] = 'UNIT_POWER_UPDATE UNIT_MAXPOWER'
 oUF.Tags.Methods['fail:tpp'] = function(u)
     if u == "target" then
         local _, class = UnitClass(u)
@@ -153,7 +153,7 @@ oUF.Tags.Methods['fail:tpp'] = function(u)
         end
     end
 end
-oUF.Tags.Events['fail:tpp'] = 'UNIT_POWER UNIT_MAXPOWER'
+oUF.Tags.Events['fail:tpp'] = 'UNIT_POWER_UPDATE UNIT_MAXPOWER'
 
 -- Level
 oUF.Tags.Methods["fail:level"] = function(unit)
