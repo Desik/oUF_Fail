@@ -9,12 +9,12 @@ local cur, max, oldMax;
 local Update = function(self, event, unit, powerType)
     if unit and (unit ~= 'player' and unit ~= 'vehicle') then return end
     if powerType and powerType ~= 'COMBO_POINTS' then return end
-
+    
     local cpoints = self.FailCPoints
-    if(cpoints.PreUpdate) then
+    if (cpoints.PreUpdate) then
         cpoints:PreUpdate()
     end
-
+    
     if UnitHasVehicleUI('player') and UnitPower('vehicle', 4) >= 1 then
         cur = UnitPower('vehicle', 4)
         max = MAX_COMBO_POINTS
@@ -22,7 +22,7 @@ local Update = function(self, event, unit, powerType)
         cur = UnitPower('player', 4)
         max = UnitPowerMax('player', 4)
     end
-
+    
     if not oldMax or max ~= oldMax then
         local width = cpoints:GetWidth()
         for i = 1, max do
@@ -35,7 +35,7 @@ local Update = function(self, event, unit, powerType)
         end
         oldMax = max
     end
-
+    
     for i = 1, max do
         if i <= cur then
             cpoints[i]:Show()
@@ -43,14 +43,14 @@ local Update = function(self, event, unit, powerType)
             cpoints[i]:Hide()
         end
     end
-
-    if(cpoints.PostUpdate) then
+    
+    if (cpoints.PostUpdate) then
         return cpoints:PostUpdate(cur)
     end
 end
 
 local Path = function(self, ...)
-    return (self.FailCPoints.Override or Update) (self, ...)
+    return (self.FailCPoints.Override or Update)(self, ...)
 end
 
 local ForceUpdate = function(element)
@@ -59,28 +59,28 @@ end
 
 local Enable = function(self)
     local cpoints = self.FailCPoints
-    if(cpoints) then
+    if (cpoints) then
         cpoints.__owner = self
         cpoints.ForceUpdate = ForceUpdate
-
+        
         self:RegisterEvent('UNIT_POWER_FREQUENT', Path)
         self:RegisterEvent('UNIT_MAXPOWER', Path)
-
+        
         for index = 1, MAX_COMBO_POINTS do
             local cpoint = cpoints[index]
-            if(cpoint:IsObjectType'Texture' and not cpoint:GetTexture()) then
-                cpoint:SetTexture[[Interface\ComboFrame\ComboPoint]]
+            if (cpoint:IsObjectType 'Texture' and not cpoint:GetTexture()) then
+                cpoint:SetTexture [[Interface\ComboFrame\ComboPoint]]
                 cpoint:SetTexCoord(0, 0.375, 0, 1)
             end
         end
-
+        
         return true
     end
 end
 
 local Disable = function(self)
     local cpoints = self.FailCPoints
-    if(cpoints) then
+    if (cpoints) then
         self:UnregisterEvent('UNIT_POWER_FREQUENT', Path)
         self:UnregisterEvent('UNIT_MAXPOWER', Path)
     end

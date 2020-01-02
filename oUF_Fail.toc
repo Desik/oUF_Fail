@@ -1,7 +1,7 @@
-## Interface: 70000
-## Author: Sauerkraut - (FailAoS#1254), MiRai 
+## Interface: 80205
+## Author: Sauerkraut - (FailAoS#1254), MiRai, Desik
 ## Title: oUF_Fail
-## Version: 1.6.9 (2016.08.23)
+## Version: 2.0 (2020.01.01)
 ## Notes: Simple Layout for oUF (a fork of oUF_Karma)
 ## RequiredDeps: oUF
 ## OptionalDeps: oUF_WeaponEnchant, oUF_Experience, oUF_Reputation, oUF_CombatFeedback, oUF_FloatingCombatFeedback 
@@ -16,7 +16,7 @@ Elements\DebuffHighlight.lua
 Elements\raidDebuffs.lua
 Elements\smooth.lua
 Elements\ComboPoints.lua
-Elements\PartyPets.xml
+##Elements\PartyPets.xml
 
 lib.lua
 core.lua
