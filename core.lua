@@ -66,9 +66,9 @@ local UnitSpecific = {
             lib.gen_ppbar(self)
             lib.gen_RaidMark(self)
             lib.gen_combat_feedback(self)
-            lib.gen_floating_combat_feedback(self)
             lib.gen_InfoIcons(self)
             lib.HealPred(self)
+            
             -- Buffs and Debuffs
             if cfg.showPlayerAuras then
                 BuffFrame:Hide()
@@ -86,9 +86,6 @@ local UnitSpecific = {
             self.Power.Smooth = true
             self.Power.frequentUpdates = true
             self.Power.bg.multiplier = 0.2
-            
-            lib.gen_exp(self)
-            lib.gen_rep(self)
             lib.gen_castbar(self)
             lib.debuffHighlight(self)
             self.Power.PostUpdate = lib.setPowerArrowColor
@@ -97,23 +94,19 @@ local UnitSpecific = {
             local pvp = self.Health:CreateTexture(nil, "OVERLAY")
             pvp:SetHeight(32)
             pvp:SetWidth(32)
-            pvp:SetPoint("BOTTOMLEFT", -8, -16
-            )
-            self.MyPvP = pvp
+            pvp:SetPoint("BOTTOMLEFT", -8, -16)
+            self.PvPIndicator = pvp
             
             -- This makes oUF update the information.
             self:RegisterEvent("UNIT_FACTION", MyPvPUpdate)
             -- This makes oUF update the information on forced updates.
             table.insert(self.__elements, MyPvPUpdate)
-            
+            -- Class Bars
             if cfg.showRunebar then lib.genRunes(self) end
             if cfg.showClassbar then lib.gen_Classbar(self) end
             lib.RogueComboPoints(self)
             lib.gen_AltPowerBar(self)
-            
-            -- Addons
-            if cfg.showTotemBar then lib.gen_TotemBar(self) end
-        --== smooth power text for player==--
+        
         end,
         
         target = function(self, ...)
@@ -131,7 +124,7 @@ local UnitSpecific = {
             lib.gen_ppbar(self)
             lib.gen_RaidMark(self)
             lib.gen_combat_feedback(self)
-            lib.gen_floating_combat_feedback(self)
+            lib.RogueComboPoints(self)
             
             --style specific stuff
             self.Health.frequentUpdates = true
@@ -170,40 +163,6 @@ local UnitSpecific = {
             if cfg.showTargetDebuffs then lib.createDebuffs(self) end
         end,
         
-        targettarget = function(self, ...)
-            
-            self.mystyle = "tot"
-            
-            -- Size and Scale
-            self:SetScale(cfg.scale)
-            self:SetSize(150, 30)
-            
-            -- Generate Bars
-            lib.gen_hpbar(self)
-            lib.gen_hpstrings(self)
-            lib.gen_highlight(self)
-            lib.gen_ppbar(self)
-            lib.gen_RaidMark(self)
-            
-            --style specific stuff
-            self.Health.frequentUpdates = true
-            self.Health.colorSmooth = true
-            self.Health.Smooth = true
-            -- self.Health.bg.multiplier = 0.3
-            self.Power.Smooth = true
-            self.Power.colorTapping = true
-            self.Power.colorDisconnected = true
-            self.Power.colorHappiness = false
-            self.Power.colorClass = true
-            self.Power.colorReaction = true
-            self.Power.colorHealth = true
-            self.Power.bg.multiplier = 0.5
-            lib.HealPred(self)
-            lib.createBuffs(self)
-            lib.createDebuffs(self)
-        
-        end,
-        
         focus = function(self, ...)
             
             self.mystyle = "focus"
@@ -236,6 +195,40 @@ local UnitSpecific = {
             lib.gen_castbar(self)
             lib.HealPred(self)
             lib.createDebuffs(self)
+        end,
+        
+        targettarget = function(self, ...)
+            
+            self.mystyle = "tot"
+            
+            -- Size and Scale
+            self:SetScale(cfg.scale)
+            self:SetSize(150, 30)
+            
+            -- Generate Bars
+            lib.gen_hpbar(self)
+            lib.gen_hpstrings(self)
+            lib.gen_highlight(self)
+            lib.gen_ppbar(self)
+            lib.gen_RaidMark(self)
+            
+            --style specific stuff
+            self.Health.frequentUpdates = true
+            self.Health.colorSmooth = true
+            self.Health.Smooth = true
+            -- self.Health.bg.multiplier = 0.3
+            self.Power.Smooth = true
+            self.Power.colorTapping = true
+            self.Power.colorDisconnected = true
+            self.Power.colorHappiness = false
+            self.Power.colorClass = true
+            self.Power.colorReaction = true
+            self.Power.colorHealth = true
+            self.Power.bg.multiplier = 0.5
+            lib.HealPred(self)
+            lib.createBuffs(self)
+            lib.createDebuffs(self)
+        
         end,
         
         focustarget = function(self, ...)
@@ -307,40 +300,6 @@ local function CreatePetStyle(self, unit)
 
 end
 
--- Partypet style
-local function CreatePartyPetStyle(self)
-    
-    -- Size and Scale
-    self:SetScale(cfg.scale)
-    self:SetSize(90, 30)
-    self.mystyle = "partypet"
-    self.Range = {
-        insideAlpha = 1,
-        outsideAlpha = .3,
-    }
-    -- Generate Bars
-    lib.gen_hpbar(self)
-    lib.gen_hpstrings(self)
-    lib.gen_highlight(self)
-    lib.gen_ppbar(self)
-    lib.gen_RaidMark(self)
-    
-    --style specific stuff
-    self.Health.frequentUpdates = true
-    self.Health.colorSmooth = true
-    self.Health.Smooth = true
-    -- self.Health.bg.multiplier = 0.3
-    self.Power.Smooth = true
-    self.Power.colorTapping = true
-    self.Power.colorDisconnected = true
-    self.Power.colorHappiness = false
-    self.Power.colorClass = true
-    self.Power.colorReaction = true
-    self.Power.colorHealth = true
-    self.Power.bg.multiplier = 0.5
-    lib.gen_castbar(self)
-
-end
 
 -- Party style
 local function CreatePartyStyle(self)
@@ -397,7 +356,7 @@ local CreateRaidStyle = function(self, unit, isSingle)
     self:SetAttribute("*type2", "menu")
     self:SetScript("OnEnter", UnitFrame_OnEnter)
     self:SetScript("OnLeave", UnitFrame_OnLeave)
-    self.mystyle = "failRaid"
+    self.mystyle = "raid"
     self.Range = {
         insideAlpha = 1,
         outsideAlpha = .3,
@@ -552,7 +511,7 @@ end
 oUF:RegisterStyle('fail', GlobalStyle)
 oUF:RegisterStyle('failPet', CreatePetStyle)
 oUF:RegisterStyle('failParty', CreatePartyStyle)
-oUF:RegisterStyle('failRaid', CreateRaidStyle)
+oUF:RegisterStyle('raid', CreateRaidStyle)
 oUF:RegisterStyle('failMT', CreateMTStyle)
 oUF:RegisterStyle('failArena', CreateArenaStyle)
 oUF:RegisterStyle('failBoss', CreateBossStyle)
@@ -586,7 +545,10 @@ oUF:Factory(function(self)
                 "oUF-initialConfigFunction", ([[
 			self:SetWidth(%d)
 			self:SetHeight(%d)
-   		]] ):format(128, 26))
+   		]]
+                
+                
+                ):format(128, 26))
             party:SetScale(cfg.partyScale)
             party:SetPoint('BOTTOM', UIParent, 'CENTER', cfg.PartyX, cfg.PartyY)
         else
@@ -595,7 +557,7 @@ oUF:Factory(function(self)
         
         -- Raid Frames
         if cfg.ShowRaid then
-            self:SetActiveStyle('failRaid')
+            self:SetActiveStyle('raid')
             
             local raid25 = oUF:SpawnHeader("oUF_Raid", nil, "custom show; [@raid6,exists] show; hide", -- Raid frames for 6-25 players.
                 "showRaid", cfg.ShowRaid,
@@ -616,7 +578,10 @@ oUF:Factory(function(self)
                 "oUF-initialConfigFunction", ([[
 		self:SetWidth(%d)
 		self:SetHeight(%d)
-		]] ):format(75, 25))
+		]]
+                
+                
+                ):format(75, 25))
             --raid25:SetScale(cfg.raidScale)
             raid25:SetPoint('TOPLEFT', UIParent, 'TOPLEFT', cfg.RaidX, cfg.RaidY)
             
@@ -638,7 +603,10 @@ oUF:Factory(function(self)
                 "oUF-initialConfigFunction", ([[
 		self:SetWidth(%d)
 		self:SetHeight(%d)
-		]]):format(50, 25))
+		]]
+                
+                
+                ):format(50, 25))
             --raid40:SetScale(cfg.raidScale)
             raid40:SetPoint('CENTER', UIParent, 'CENTER', cfg.RaidX + 135, cfg.RaidY)
         
@@ -651,7 +619,10 @@ oUF:Factory(function(self)
                 'oUF-initialConfigFunction', ([[
 				self:SetWidth(%d)
 				self:SetHeight(%d)
-			]] ):format(80, 22),
+			]]
+                
+                
+                ):format(80, 22),
                 'showRaid', true,
                 'groupFilter', 'MAINTANK',
                 'yOffset', 8,

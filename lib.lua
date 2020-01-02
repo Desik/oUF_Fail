@@ -20,12 +20,11 @@ oUF.colors.power['POWER_TYPE_BLOOD_POWER'] = {0.9, 0.1, 0.1}
 local _, pType = UnitPowerType("player")
 local pcolor = oUF.colors.power[pType] or {.3, .45, .65}
 oUF.colors.runes = {{196 / 255, 30 / 255, 58 / 255}; {173 / 255, 217 / 255, 25 / 255}; {35 / 255, 127 / 255, 255 / 255}; {178 / 255, 53 / 255, 240 / 255}; }
-
 -- FUNCTIONS
 local retVal = function(f, val1, val2, val3)
     if f.mystyle == "player" or f.mystyle == "target" then
         return val1
-    elseif f.mystyle == "failRaid" or f.mystyle == "party" then
+    elseif f.mystyle == "raid" or f.mystyle == "party" then
         return val3
     else
         return val2
@@ -36,6 +35,11 @@ end
 local fixStatusbar = function(b)
     b:GetStatusBarTexture():SetHorizTile(false)
     b:GetStatusBarTexture():SetVertTile(false)
+end
+
+local fixTex = function(tex)
+    local ULx, ULy, LLx, LLy, URx, URy, LRx, LRy = tex:GetTexCoord()
+    tex:SetTexCoord(ULy, ULx, LLy, LLx, URy, URx, LRy, LRx)
 end
 
 --backdrop table
@@ -93,10 +97,15 @@ lib.menu = function(self)
         cunit = 'Pet'
     end
     
-    if (unit == "party" or unit == "partypet") then
+    if (unit == "party") then
         ToggleDropDownMenu(1, nil, _G["PartyMemberFrame" .. self.id .. "DropDown"], "cursor", 0, 0)
     elseif (_G[cunit .. "FrameDropDown"]) then
         ToggleDropDownMenu(1, nil, _G[cunit .. "FrameDropDown"], "cursor", 0, 0)
+    elseif unit == "raid" then
+        FriendsDropDown.unit = self.unit
+        FriendsDropDown.id = self.id
+        FriendsDropDown.initialize = RaidFrameDropDown_Initialize
+        ToggleDropDownMenu(1, nil, FriendsDropDown, "cursor")
     end
 end
 
@@ -111,71 +120,14 @@ lib.gen_fontstring = function(f, name, size, outline)
     return fs
 end
 
--- Power Bar Arrow Function
--- Special thanks to Zork and Rainrider for the initial implementation
--- And special thanks to MiRai, Phanx and Caleb for helping improve on it
-local arrow = {[[Interface\Addons\oUF_Fail\media\textureArrow]]}
-local arrowDefaultColor = {.55, 0, 0}-- Dark Red
-
-lib.setPowerArrowColor = function(self)
-    local unit = self.__owner.unit -- store this to avoid extra table lookups
-    local _, powerType = UnitPowerType(unit)
-    
-    if powerType and UnitIsPlayer(unit) then -- make sure powerType is non-nil
-        local color
-        if unit == "focustarget" and powerType == "RAGE" then
-            color = arrowDefaultColor
-        else
-            color = oUF.colors.power[powerType] or arrowDefaultColor -- fall back to default color for undefined power types
-        end
-        self.arrow:SetVertexColor(color[1], color[2], color[3])-- 3 table lookups is still faster than 1 function call
-        self.arrow:Show()
-    else
-        self.arrow:Hide()
-    end
-end
-
-lib.setClassArrowColor = function(self)
-    local unit = self.__owner.unit
-    local _, classType = UnitClass(unit)
-    if classType and UnitIsPlayer(unit) then
-        local color = oUF.colors.class[classType] or arrowDefaultColor
-        self.arrow:SetVertexColor(color[1], color[2], color[3])
-        self.arrow:Show()
-    else
-        self.arrow:Hide()
-    end
-end
-
-local fixTex = function(tex)
-    local ULx, ULy, LLx, LLy, URx, URy, LRx, LRy = tex:GetTexCoord()
-    tex:SetTexCoord(ULy, ULx, LLy, LLx, URy, URx, LRy, LRx)
-end
-
-function AltPowerBarOnToggle(self)
-    local unit = self:GetParent().unit or self:GetParent():GetParent().unit
-end
-function AltPowerBarPostUpdate(self, min, cur, max)
-    local perc = math.floor((cur / max) * 100)
-    if perc < 35 then
-        self:SetStatusBarColor(0, 1, 0)
-    elseif perc < 70 then
-        self:SetStatusBarColor(1, 1, 0)
-    else
-        self:SetStatusBarColor(1, 0, 0)
-    end
-    local unit = self:GetParent().unit or self:GetParent():GetParent().unit
-    local type = select(10, UnitAlternatePowerInfo(unit))
-end
-
 --gen healthbar func
 lib.gen_hpbar = function(f)
-        --local unit = f.__owner.unit
-        local class, classFileName = UnitClass("player")
+        -- local unit = f.__owner.unit
+        -- local class, classFileName = UnitClass("player")
         --statusbar
         local s = CreateFrame("StatusBar", nil, f)
         s:SetStatusBarTexture(cfg.statusbar_texture)
-        fixStatusbar(s)
+        s:GetStatusBarTexture():SetHorizTile(true)
         s:SetHeight(retVal(f, 30, 24, 20))
         s:SetWidth(f:GetWidth())
         s:SetPoint("BOTTOM", 0, 0)
@@ -218,7 +170,7 @@ lib.gen_hpstrings = function(f, unit)
         if f.mystyle == "player" then fontsize = cfg.healthbarfontsize
         elseif f.mystyle == "target" then fontsize = 15
         elseif f.mystyle == "party" then fontsize = 15
-        elseif f.mystyle == "failRaid" then fontsize = 12
+        elseif f.mystyle == "raid" then fontsize = 12
         else fontsize = 16
         end
         
@@ -244,7 +196,7 @@ lib.gen_hpstrings = function(f, unit)
         elseif f.mystyle == "party" or f.mystyle == "pet" or f.mystyle == "partypet" then
             hpval:SetPoint("RIGHT", f.Health, "RIGHT", 6, -8)
             hpval:SetJustifyH("LEFT")
-        elseif f.mystyle == "failRaid" then
+        elseif f.mystyle == "raid" then
             hpval:SetPoint("RIGHT", f.Health, "RIGHT", 5, -6)
             hpval:SetJustifyH("RIGHT")
         elseif f.mystyle == "focus" or f.mystyle == "focustarget" then
@@ -293,7 +245,7 @@ lib.gen_ppbar = function(f)
         --statusbar
         local s = CreateFrame("StatusBar", nil, f)
         s:SetStatusBarTexture(cfg.powerbar_texture)
-        fixStatusbar(s)
+        s:GetStatusBarTexture():SetHorizTile(true)
         if f.mystyle == "player" or f.mystyle == "pet" then
             s:SetHeight(20)
             s:SetWidth(f:GetWidth())
@@ -316,7 +268,7 @@ lib.gen_ppbar = function(f)
         b:SetTexture(cfg.powerbar_texture)
         b:SetAllPoints(s)
         --arrow
-        if f.mystyle ~= "tot" and f.mystyle ~= "failRaid" and f.mystyle ~= "pet" then
+        if f.mystyle ~= "tot" and f.mystyle ~= "raid" and f.mystyle ~= "pet" then
             s.arrow = s:CreateTexture(nil, "OVERLAY")
             s.arrow:SetTexture([[Interface\Addons\oUF_Fail\media\textureArrow]])
             s.arrow:SetSize(16, 16)
@@ -379,18 +331,18 @@ lib.gen_InfoIcons = function(f)
     h:SetFrameLevel(10)
     --combat icon
     if f.mystyle == 'player' then
-        f.Combat = h:CreateTexture(nil, 'OVERLAY')
-        f.Combat:SetSize(16, 16)
-        f.Combat:SetPoint('LEFT', -4, -16)
-        f.Combat:SetTexture([[Interface\Addons\oUF_Fail\media\combat]])
+        f.CombatIndicator = h:CreateTexture(nil, 'OVERLAY')
+        f.CombatIndicator:SetSize(16, 16)
+        f.CombatIndicator:SetPoint('LEFT', -4, -16)
+        f.CombatIndicator:SetTexture([[Interface\Addons\oUF_Fail\media\combat]])
     end
     -- rest icon
     if f.mystyle == 'player' and UnitLevel("Player") < 100 then
-        f.Resting = h:CreateTexture(nil, 'OVERLAY')
-        f.Resting:SetSize(22, 22)
-        f.Resting:SetPoint('BOTTOMLEFT', -3, -3)
-        f.Resting:SetTexture([[Interface\Addons\oUF_Fail\media\resting]])
-        f.Resting:SetAlpha(0.75)
+        f.RestingIndicator = h:CreateTexture(nil, 'OVERLAY')
+        f.RestingIndicator:SetSize(22, 22)
+        f.RestingIndicator:SetPoint('BOTTOMLEFT', -3, -3)
+        f.RestingIndicator:SetTexture([[Interface\Addons\oUF_Fail\media\resting]])
+        f.RestingIndicator:SetAlpha(0.75)
     end
     --Leader icon
     li = h:CreateTexture(nil, "OVERLAY")
@@ -439,7 +391,7 @@ lib.addPhaseIcon = function(self)
     picon:SetPoint('TOPRIGHT', self, 'TOPRIGHT', 40, 8)
     picon:SetSize(16, 16)
     
-    self.PhaseIcon = picon
+    self.PhaseIndicator = picon
 end
 
 -- quest icon
@@ -448,7 +400,7 @@ lib.addQuestIcon = function(self)
     qicon:SetPoint('TOPLEFT', self, 'TOPLEFT', 0, 8)
     qicon:SetSize(16, 16)
     
-    self.QuestIcon = qicon
+    self.QuestIndicator = qicon
 end
 
 --gen raid mark icons
@@ -462,7 +414,7 @@ lib.gen_RaidMark = function(f)
     ri:SetTexture([[Interface\Addons\oUF_Fail\media\raidicons.blp]])
     local size = retVal(f, 24, 14, 18)
     ri:SetSize(size, size)
-    f.RaidIcon = ri
+    f.RaidTargetIndicator = ri
 end
 
 --gen hilight texture
@@ -479,7 +431,7 @@ lib.gen_highlight = function(f)
     f:SetScript("OnLeave", OnLeave)
     local hl = f.Health:CreateTexture(nil, "OVERLAY")
     hl:SetAllPoints(f.Health)
-    hl:SetTexture(cfg.statusbar_texture)
+    hl:SetTexture(cfg.highlight_texture)
     hl:SetVertexColor(.5, .5, .5, .1)
     hl:SetBlendMode("ADD")
     hl:Hide()
@@ -488,6 +440,7 @@ end
 
 -- Create Target Border
 function lib.CreateTargetBorder(self)
+
     self.TargetBorder = self.Health:CreateTexture("BACKGROUND", nil, self)
     self.TargetBorder:SetPoint("TOPLEFT", self.Health, "TOPLEFT", -24, 24)
     self.TargetBorder:SetPoint("BOTTOMRIGHT", self.Health, "BOTTOMRIGHT", 24, -24)
@@ -500,7 +453,7 @@ end
 -- Raid Frames Target Highlight Border
 function lib.ChangedTarget(self, event, unit)
     
-    if (UnitIsUnit('target', 'player')) then
+    if UnitIsUnit('target', self.unit) then
         self.TargetBorder:Show()
     else
         self.TargetBorder:Hide()
@@ -537,6 +490,7 @@ function lib.UpdateThreat(self, event, unit)
     end
 end
 
+
 -- Castbar
 local PostCastStart = function(castbar, unit)
     if unit ~= 'player' then
@@ -558,6 +512,7 @@ local CustomTimeText = function(castbar, duration)
     end
 end
 
+--gen castbar
 lib.gen_castbar = function(f)
     if not cfg.Castbars then return end
     local cbColor = {95 / 255, 182 / 255, 255 / 255}
@@ -977,12 +932,6 @@ end
 -- Class Power
 lib.gen_Classbar = function(self)
         
-        -- local pad
-        -- if (IsAddOnLoaded('oUF_Experience') or IsAddOnLoaded('oUF_Reputation')) then pad = -8
-        -- else
-        --     pad = 0
-        -- end
-        
         local maxPower, color
         if playerClass == "MAGE" then
             maxPower = 4
@@ -1026,19 +975,13 @@ lib.gen_Classbar = function(self)
                 end
             end
             
-            self.ClassIcons = ClassIcons
+            self.ClassPower = ClassIcons
         end
 end
 
 -- Combo points
 lib.RogueComboPoints = function(self)
     if (playerClass == "ROGUE" or playerClass == "DRUID") then
-        
-        -- local pad
-        -- if (IsAddOnLoaded('oUF_Experience') or IsAddOnLoaded('oUF_Reputation')) then pad = -8
-        -- else
-        --     pad = 0
-        -- end
         
         local combo = CreateFrame("Frame", nil, self)
         combo:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", 0, -5)
@@ -1089,7 +1032,7 @@ lib.ReadyCheck = function(self)
         rCheck = self.Health:CreateTexture(nil, "OVERLAY")
         rCheck:SetSize(14, 14)
         rCheck:SetPoint("BOTTOMLEFT", self.Health, "TOPRIGHT", -13, -12)
-        self.ReadyCheck = rCheck
+        self.ReadyCheckIndicator = rCheck
     end
 end
 
@@ -1107,24 +1050,109 @@ lib.raidDebuffs = function(f)
                 ["Counterspell"] = 10, -- Counterspell
                 ["Blind"] = 10, -- Blind
                 ["Cyclone"] = 10, -- Cyclone
-                ["Hex"] = 7, -- Hex
                 ["Polymorph"] = 7, -- Polymorph
                 ["Entangling Roots"] = 7, -- Entangling Roots
-                ["Frost Nova"] = 7, -- Frost Nova
                 ["Freezing Trap"] = 7, -- Freezing Trap
                 ["Crippling Poison"] = 6, -- Crippling Poison
-                ["Bash"] = 5, -- Bash
-                ["Cheap Shot"] = 5, -- Cheap Shot
-                ["Kidney Shot"] = 5, -- Kidney Shot
-                ["Throwdown"] = 5, -- Throwdown
-                ["Sap"] = 5, -- Sap
                 ["Hamstring"] = 5, -- Hamstring
                 ["Wing Clip"] = 5, -- Wing Clip
                 ["Fear"] = 3, -- Fear
                 ["Psychic Scream"] = 3, -- Psychic Scream
                 ["Howl of Terror"] = 3, -- Howl of Terror
-                ["Intimidating Shout"] = 3, -- Intimidating Shout
-            
+                -- Naxxramas
+                ["Locust Swarm"] = 12,
+                ["Necrotic Poison"] = 12,
+                ["Web Wrap"] = 12,
+                ["Jagged Knife"] = 12,
+                ["Mutating Injection"] = 12,
+                ["Detonate Mana"] = 12,
+                ["Frost Blast"] = 12,
+                ["Chains of Kel'Thuzad"] = 12,
+                -- Ulduar
+                ["Slag Pot"] = 12,
+                ["Gravity Bomb"] = 12,
+                ["Light Bomb"] = 12,
+                ["Fusion Punch"] = 12,
+                ["Static Disruption"] = 12,
+                ["Stone Grip"] = 12,
+                ["Crunch Armor"] = 12,
+                ["Flash Freeze"] = 12,
+                ["Unbalancing Strike"] = 12,
+                ["Iron Roots"] = 12,
+                ["Nature's Fury"] = 12,
+                ["Napalm Shell"] = 12,
+                ["Mark of the Faceless"] = 12,
+                ["Sara's Fevor"] = 12,
+                ["Squeeze"] = 12,
+                ["Phase Punch"] = 12,
+                -- Trial of the Crusader
+                -- Beasts
+                ["Impale"] = 12,
+                ["Snobolled!"] = 12,
+                ["Paralytic Toxin"] = 12,
+                ["Burning Bile"] = 12,
+                ["Arctic Breathe"] = 12,
+                -- Jaraxxus
+                ["Mistress' Kiss"] = 12,
+                ["Legion Flame"] = 12,
+                ["Incinerate Flesh"] = 11,
+                -- Twins
+                ["Touch of Darkness"] = 12,
+                ["Touch of Light"] = 12,
+                -- Anub
+                ["Pursued by Anub'arak"] = 12,
+                ["Penetrating Cold"] = 12,
+                -- Trial of the Grand Crusader
+                -- Beasts
+                ["Impale"] = 12,
+                ["Snobolled!"] = 12,
+                ["Paralytic Toxin"] = 12,
+                ["Burning Bile"] = 12,
+                ["Arctic Breathe"] = 12,
+                -- Jaraxxus
+                ["Mistress' Kiss"] = 12,
+                ["Legion Flame"] = 12,
+                ["Incinerate Flesh"] = 11,
+                -- Twins
+                ["Touch of Darkness"] = 12,
+                ["Touch of Light"] = 12,
+                -- Anub
+                ["Pursued by Anub'arak"] = 12,
+                ["Penetrating Cold"] = 12,
+                -- Icecrown Citadel
+                -- Lord Marrowgar
+                ["Impaled"] = 12,
+                -- Gunship Battle
+                ["Wounding Strike"] = 12,
+                -- Saurfang
+                ["Boiling Blood"] = 12,
+                ["Mark of the Fallen Champion"] = 12,
+                -- Festergut
+                ["Gas Spore"] = 12,
+                ["Vile Gas"] = 12,
+                -- Rotface
+                ["Mutated Infection"] = 12,
+                -- Putricide
+                ["Gaseous Bloat"] = 12,
+                ["Volatile Ooze Adhesive"] = 12,
+                -- Lana'thel
+                ["Pact of the Darkfallen"] = 12,
+                ["Essence of the Blood Queen"] = 10,
+                -- Sindragosa
+                ["Frost Beacon"] = 12,
+                --		["Unchained Magic"] = 10,
+                ["Instability"] = 12,
+                -- Lich King
+                ["Necrotic Plague"] = 12,
+                ["Pain and Suffering"] = 12,
+                ["Infest"] = 11,
+                -- Ruby Sanctum
+                ["Enervating Brand"] = 12, -- Enervating Brand
+                ["Blazing Aura"] = 12, -- Blazing Aura
+                ["Fiery Combustion"] = 12, -- Fiery Combustion
+                ["Mark of Combustion"] = 12, -- Mark of Combustion (Fire)
+                ["Soul Consumption"] = 12, -- Soul Consumption
+                ["Mark Of Consumption"] = 12, -- Mark Of Consumption (Soul)
             },
         }
         
@@ -1191,47 +1219,6 @@ lib.HealPred = function(self)
 end
 
 -- Addons/Plugins -------------------------------------------
--- Totem timer
-lib.gen_TotemBar = function(self)
-    if playerClass ~= "SHAMAN" then return end
-    local totems = CreateFrame("Frame", nil, self)
-    totems:SetPoint("TOPLEFT", self, "TOPLEFT", 4, -3)
-    totems:SetWidth(self:GetWidth() - 140)
-    totems:SetHeight(6)
-    totems:SetFrameLevel(6)
-    totems.Destroy = true
-    totems.colors = {{233 / 255, 46 / 255, 16 / 255}; {173 / 255, 217 / 255, 25 / 255}; {35 / 255, 127 / 255, 255 / 255}; {178 / 255, 53 / 255, 240 / 255}; }
-    
-    for i = 1, 4 do
-        totems[i] = CreateFrame("StatusBar", nil, totems)
-        totems[i]:SetHeight(totems:GetHeight())
-        totems[i]:SetWidth(((self:GetWidth() - 140) - 3) / 4)
-        
-        if (i == 1) then
-            totems[i]:SetPoint("LEFT", totems)
-        else
-            totems[i]:SetPoint("LEFT", totems[i - 1], "RIGHT", 1, 0)
-        end
-        totems[i]:SetStatusBarTexture(cfg.statusbar_texture)
-        totems[i]:GetStatusBarTexture():SetHorizTile(false)
-        totems[i]:SetMinMaxValues(0, 1)
-        
-        totems[i].bg = totems[i]:CreateTexture(nil, "BORDER")
-        totems[i].bg:SetAllPoints()
-        totems[i].bg:SetTexture(cfg.statusbar_texture)
-        totems[i].bg.multiplier = 0.3
-    end
-    totems.backdrop = CreateFrame("Frame", nil, totems)
-    
-    --[[CreateShadowclassbar(totems.backdrop)
-    totems.backdrop:SetBackdropBorderColor(.2,.2,.2,1)
-    totems.backdrop:SetPoint("TOPLEFT", -2, 2)
-    totems.backdrop:SetPoint("BOTTOMRIGHT", 2, -2)
-    totems.backdrop:SetFrameLevel(5) ]]
-    self.TotemBar = totems
-end
-
-
 
 -- oUF_DebuffHighlight
 lib.debuffHighlight = function(self)
@@ -1245,6 +1232,76 @@ lib.debuffHighlight = function(self)
         self.DebuffHighlightAlpha = 0.5
         self.DebuffHighlightFilter = true
     end
+end
+
+-- oUF_CombatFeedback
+lib.gen_combat_feedback = function(self)
+    if IsAddOnLoaded("oUF_CombatFeedback") and cfg.CombatFeedback then
+        local h = CreateFrame("Frame", nil, self.Health)
+        h:SetAllPoints(self.Health)
+        h:SetFrameLevel(30)
+        local cfbt = lib.gen_fontstring(h, cfg.font, 18, "THINOUTLINE")
+        cfbt:SetPoint("CENTER", self.Health, "BOTTOM", 0, -1)
+        cfbt.maxAlpha = 0.75
+        cfbt.ignoreEnergize = true
+        self.CombatFeedbackText = cfbt
+    end
+end
+
+
+
+
+
+-- Power Bar Arrow Function
+-- Special thanks to Zork and Rainrider for the initial implementation
+-- And special thanks to MiRai, Phanx and Caleb for helping improve on it
+local arrow = {[[Interface\Addons\oUF_Fail\media\textureArrow]]}
+local arrowDefaultColor = {.55, 0, 0}-- Dark Red
+
+lib.setPowerArrowColor = function(self)
+    local unit = self.__owner.unit -- store this to avoid extra table lookups
+    local _, powerType = UnitPowerType(unit)
+    
+    if powerType and UnitIsPlayer(unit) then -- make sure powerType is non-nil
+        local color
+        if unit == "focustarget" and powerType == "RAGE" then
+            color = arrowDefaultColor
+        else
+            color = oUF.colors.power[powerType] or arrowDefaultColor -- fall back to default color for undefined power types
+        end
+        self.arrow:SetVertexColor(color[1], color[2], color[3])-- 3 table lookups is still faster than 1 function call
+        self.arrow:Show()
+    else
+        self.arrow:Hide()
+    end
+end
+
+lib.setClassArrowColor = function(self)
+    local unit = self.__owner.unit
+    local _, classType = UnitClass(unit)
+    if classType and UnitIsPlayer(unit) then
+        local color = oUF.colors.class[classType] or arrowDefaultColor
+        self.arrow:SetVertexColor(color[1], color[2], color[3])
+        self.arrow:Show()
+    else
+        self.arrow:Hide()
+    end
+end
+
+function AltPowerBarOnToggle(self)
+    local unit = self:GetParent().unit or self:GetParent():GetParent().unit
+end
+function AltPowerBarPostUpdate(self, min, cur, max)
+    local perc = math.floor((cur / max) * 100)
+    if perc < 35 then
+        self:SetStatusBarColor(0, 1, 0)
+    elseif perc < 70 then
+        self:SetStatusBarColor(1, 1, 0)
+    else
+        self:SetStatusBarColor(1, 0, 0)
+    end
+    local unit = self:GetParent().unit or self:GetParent():GetParent().unit
+    local type = select(10, UnitAlternatePowerInfo(unit))
 end
 
 -- AuraWatch
@@ -1321,125 +1378,6 @@ lib.createAuraWatch = function(self, unit)
     end
 end
 
--- oUF_Experience
-lib.gen_exp = function(self)
-    if (IsAddOnLoaded('oUF_Experience')) and UnitLevel("player") ~= MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()] then
-        local Experience = CreateFrame("StatusBar", nil, self)
-        Experience:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", 8, 8)
-        Experience:SetStatusBarTexture(cfg.xpbar_texture)
-        Experience:SetStatusBarColor(0.8, 0.1, 1, 0.8)
-        Experience:SetHeight(16)
-        Experience:SetWidth(self.Health:GetWidth())
-        Experience:SetFrameLevel(1)
-        fixStatusbar(Experience)
-        
-        local h = CreateFrame("Frame", nil, Experience)
-        h:SetFrameLevel(0)
-        h:SetPoint("TOPLEFT", -5, 5)
-        h:SetPoint("BOTTOMRIGHT", 5, -5)
-        lib.gen_expback(h)
-        
-        local Rested = CreateFrame("StatusBar", nil, Experience)
-        Rested:SetStatusBarTexture(cfg.xpbar_texture)
-        Rested:SetStatusBarColor(0, 0.4, 1, 0.8)
-        Rested:SetAllPoints(Experience)
-        fixStatusbar(Rested)
-        
-        local bg = Rested:CreateTexture(nil, 'BACKGROUND')
-        bg:SetAllPoints(Experience)
-        bg:SetTexture(cfg.xpbar_texture)
-        bg:SetVertexColor(0.05, 0.05, 0.05, 0.4)
-        
-        local textframe = CreateFrame("Frame", nil, Experience)
-        textframe:SetFrameLevel(10)
-        textframe:SetAllPoints(Experience)
-        textframe:SetAlpha(0)
-        
-        local exptext = lib.gen_fontstring(textframe, cfg.font, 12, "THINOUTLINE")
-        exptext:SetPoint("CENTER", textframe, "BOTTOM", 0, 0)
-        self:Tag(exptext, '[fail:curxp] / [fail:maxxp] - [fail:perxp]%')
-        
-        -- Mouseover!
-        textframe:HookScript('OnEnter', function(self)self:SetAlpha(1) end)
-        textframe:HookScript('OnLeave', function(self)self:SetAlpha(0) end)
-        textframe:EnableMouse(true)
-        
-        self.Experience = Experience
-        self.Experience.Rested = Rested
-    
-    end
-end
-
--- oUF_Reputation
-lib.gen_rep = function(self)
-    if (IsAddOnLoaded("oUF_Reputation")) and UnitLevel("player") == MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()] then
-        local Reputation = CreateFrame("StatusBar", nil, self)
-        Reputation:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", 8, 8)
-        Reputation:SetStatusBarTexture(cfg.xpbar_texture)
-        Reputation:SetStatusBarColor(0.8, 0.1, 1, 0.8)
-        Reputation:SetHeight(16)
-        Reputation:SetWidth(self.Health:GetWidth())
-        Reputation:SetFrameLevel(1)
-        fixStatusbar(Reputation)
-        
-        -- Color the bar by current standing
-        Reputation.colorStanding = true
-        
-        local h = CreateFrame("Frame", nil, Reputation)
-        h:SetFrameLevel(0)
-        h:SetPoint("TOPLEFT", -5, 5)
-        h:SetPoint("BOTTOMRIGHT", 5, -5)
-        lib.gen_expback(h)
-        
-        local textframe = CreateFrame("Frame", nil, Reputation)
-        textframe:SetFrameLevel(10)
-        textframe:SetAllPoints(Reputation)
-        textframe:SetAlpha(0)
-        
-        local reptext = lib.gen_fontstring(textframe, cfg.font, 10, "THINOUTLINE")
-        reptext:SetPoint("CENTER", textframe, "BOTTOM", 0, 0)
-        self:Tag(reptext, '[reputation] - [currep] / [maxrep]')
-        
-        -- Mouseover!
-        textframe:HookScript('OnEnter', function(self)self:SetAlpha(1) end)
-        textframe:HookScript('OnLeave', function(self)self:SetAlpha(0) end)
-        textframe:EnableMouse(true)
-        
-        self.Reputation = Reputation
-    end
-end
-
--- oUF_CombatFeedback
-lib.gen_combat_feedback = function(self)
-    if IsAddOnLoaded("oUF_CombatFeedback") and cfg.CombatFeedback then
-        local h = CreateFrame("Frame", nil, self.Health)
-        h:SetAllPoints(self.Health)
-        h:SetFrameLevel(30)
-        local cfbt = lib.gen_fontstring(h, cfg.font, 18, "THINOUTLINE")
-        cfbt:SetPoint("CENTER", self.Health, "BOTTOM", 0, -1)
-        cfbt.maxAlpha = 0.75
-        cfbt.ignoreEnergize = true
-        self.CombatFeedbackText = cfbt
-    end
-end
-
--- oUF_FloatingCombatFeedback
-lib.gen_floating_combat_feedback = function(self)
-    if IsAddOnLoaded("oUF_FloatingCombatFeedback") and cfg.FloatingCombatFeedback then
-        self.FloatingCombatFeedback = CreateFrame("Frame", nil, self.Health)
-        self.FloatingCombatFeedback:SetFrameLevel(30)
-        self.FloatingCombatFeedback:SetPoint("CENTER", self.Health, "BOTTOM", 0, -1)
-        for i = 1, 6 do
-            self.FloatingCombatFeedback[i] = lib.gen_fontstring(self.FloatingCombatFeedback, cfg.font, 18, "THINOUTLINE")
-        end
-        self.FloatingCombatFeedback.ignoreEnergize = true
-        if cfg.FountainMode then
-            self.FloatingCombatFeedback.Mode = "Fountain"
-        else
-            self.FloatingCombatFeedback.Mode = "Standard"
-        end
-    end
-end
 
 --hand the lib to the namespace for further usage
 ns.lib = lib
