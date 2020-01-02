@@ -130,8 +130,8 @@ local function Enable(object)
     
     -- make sure aura scanning is active for this object
     object:RegisterEvent("UNIT_AURA", Update)
-    object:RegisterEvent("PLAYER_TALENT_UPDATE", CheckSpec)
-    object:RegisterEvent("CHARACTER_POINTS_CHANGED", CheckSpec)
+    object:RegisterEvent("PLAYER_TALENT_UPDATE", CheckSpec, true)
+    object:RegisterEvent("CHARACTER_POINTS_CHANGED", CheckSpec, true)
     CheckSpec()
     
     if object.DebuffHighlightBackdrop or object.DebuffHighlightBackdropBorder then

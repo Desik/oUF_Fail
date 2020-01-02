@@ -4,29 +4,22 @@ local cast = ns.cast
 local lib = CreateFrame("Frame")
 local _, playerClass = UnitClass("player")
 
-ns.colors = setmetatable({
-    class = setmetatable({
-        ["MONK"] = {0.35, 0.98, 0.35},
-        ["HUNTER"] = {0.29, 0.89, 0.05},
-        ["WARLOCK"] = {0.49, 0.15, 0.8},
-        ["PRIEST"] = {1.0, 1.0, 1.0},
-        ["PALADIN"] = {0.96, 0.55, 0.73},
-        ["MAGE"] = {0, 0.75, 1},
-        ["ROGUE"] = {0.99, 0.82, 0.09},
-        ["DRUID"] = {1.0, 0.47, 0.13},
-        ["SHAMAN"] = {0.14, 0.35, 1.0},
-        ["WARRIOR"] = {0.78, 0.61, 0.43},
-        ["DEATHKNIGHT"] = {0.77, 0.12, 0.23},
-    }, {__index = oUF.colors.class}),
-    
-    power = setmetatable({
-        ['MANA'] = {0.18, 0.4, 1.0},
-        ['RAGE'] = {1.0, 0, 0},
-        ['FOCUS'] = {1.0, 0.75, 0.25},
-        ['ENERGY'] = {1.0, 0.9, 0.35},
-        ['RUNIC_POWER'] = {0.44, 0.44, 0.44},
-    }, {__index = oUF.colors.power}),
-}, {__index = oUF.colors})
+oUF.colors.power['MANA'] = {0.0, 0.56, 1.0}
+oUF.colors.power['RAGE'] = {1.0, 0, 0}
+oUF.colors.power['FOCUS'] = {1.0, 0.75, 0.25}
+oUF.colors.power['ENERGY'] = {0.65, 0.65, 0.35}
+oUF.colors.power['ENERGY'] = {0.65, 0.65, 0.35}
+oUF.colors.power['RUNIC_POWER'] = {0.44, 0.44, 0.44}
+oUF.colors.power['AMMOSLOT'] = {0.8, 0.6, 0}
+oUF.colors.power['FUEL'] = {0, 0.55, 0.5}
+oUF.colors.power['POWER_TYPE_STEAM'] = {0.55, 0.57, 0.61}
+oUF.colors.power['POWER_TYPE_PYRITE'] = {0.6, 0.09, 0.17}
+oUF.colors.power['POWER_TYPE_HEAT'] = {0.9, 0.45, 0.1}
+oUF.colors.power['POWER_TYPE_OOZE'] = {0.1, 0.1, 0.9}
+oUF.colors.power['POWER_TYPE_BLOOD_POWER'] = {0.9, 0.1, 0.1}
+local _, pType = UnitPowerType("player")
+local pcolor = oUF.colors.power[pType] or {.3, .45, .65}
+oUF.colors.runes = {{196 / 255, 30 / 255, 58 / 255}; {173 / 255, 217 / 255, 25 / 255}; {35 / 255, 127 / 255, 255 / 255}; {178 / 255, 53 / 255, 240 / 255}; }
 
 -- FUNCTIONS
 local retVal = function(f, val1, val2, val3)

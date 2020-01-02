@@ -23,7 +23,6 @@ local function hex(r, g, b)
         return ('|cff%02x%02x%02x'):format(r * 255, g * 255, b * 255)
     end
 end
-
 ns.colors = setmetatable({
     power = setmetatable({
         ['MANA'] = {0.18, 0.4, 1.0},
@@ -34,6 +33,8 @@ ns.colors = setmetatable({
     }, {__index = oUF.colors.power}),
 }, {__index = oUF.colors})
 
+--something is messing up here havent sorted it out yet--
+tags.Events["fail:lfdrole"] = "GROUP_ROSTER_UPDATE PLAYER_ROLES_ASSIGNED"
 tags.Methods["fail:lfdrole"] = function(unit)
     local role = UnitGroupRolesAssigned(unit)
     if role == "HEALER" then
@@ -44,19 +45,8 @@ tags.Methods["fail:lfdrole"] = function(unit)
         return "|cffFF6161DPS|r"
     end
 end
-tags.Events["fail:lfdrole"] = "PLAYER_ROLES_ASSIGNED PARTY_MEMBERS_CHANGED"
 
-tags.Methods['fail:DDG'] = function(u)
-    if not UnitIsConnected(u) then
-        return "|cffCFCFCF D/C|r"
-    elseif UnitIsGhost(u) then
-        return "|cffCFCFCF Ghost|r"
-    elseif UnitIsDead(u) then
-        return "|cffCFCFCF Dead|r"
-    end
-end
-tags.Events['fail:DDG'] = 'UNIT_NAME_UPDATE UNIT_HEALTH UNIT_CONNECTION'
-
+tags.Events['fail:hp'] = 'UNIT_HEALTH UNIT_MAXHEALTH'
 tags.Methods['fail:hp'] = function(u)
     if UnitIsDead(u) or UnitIsGhost(u) or not UnitIsConnected(u) then
         return tags.Methods['fail:DDG'](u)
@@ -74,7 +64,7 @@ tags.Methods['fail:hp'] = function(u)
         end
     end
 end
-tags.Events['fail:hp'] = 'UNIT_HEALTH UNIT_MAXHEALTH'
+
 
 tags.Methods['fail:heal'] = function(u)
     local incheal = UnitGetIncomingHeals(u, 'player') or 0
@@ -84,6 +74,7 @@ tags.Methods['fail:heal'] = function(u)
 end
 tags.Events['fail:heal'] = 'UNIT_HEAL_PREDICTION'
 
+
 tags.Methods['fail:raidhp'] = function(u)
     if UnitIsDead(u) or UnitIsGhost(u) or not UnitIsConnected(u) then
         return tags.Methods['fail:DDG'](u)
@@ -92,7 +83,7 @@ tags.Methods['fail:raidhp'] = function(u)
         return per
     end
 end
-tags.Events['fail:raidhp'] = 'UNIT_HEALTH'
+
 
 tags.Events['fail:color'] = 'UNIT_NAME_UPDATE UNIT_FACTION UNIT_HEALTH'
 tags.Methods['fail:color'] = function(u, r)
@@ -114,11 +105,22 @@ tags.Methods['fail:color'] = function(u, r)
     end
 end
 
-tags.Methods["fail:afkdnd"] = function(unit)
-        
+tags.Events["fail:afkdnd"] = 'PLAYER_FLAGS_CHANGED UNIT_POWER_UPDATE UNIT_MAXPOWER'
+tags.Methods["fail:afkdnd"] = function(unit)        
         return UnitIsAFK(unit) and "|cffCFCFCF <afk>|r" or UnitIsDND(unit) and "|cffCFCFCF <dnd>|r" or ""
 end
-tags.Events["fail:afkdnd"] = 'PLAYER_FLAGS_CHANGED UNIT_POWER_UPDATE UNIT_MAXPOWER'
+
+tags.Methods['fail:DDG'] = function(u)
+    if not UnitIsConnected(u) then
+        return "|cffCFCFCF D/C|r"
+    elseif UnitIsGhost(u) then
+        return "|cffCFCFCF Ghost|r"
+    elseif UnitIsDead(u) then
+        return "|cffCFCFCF Dead|r"
+    end
+end
+
+
 
 tags.Methods['fail:power'] = function(u)
     local min, max = UnitPower(u), UnitPowerMax(u)

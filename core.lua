@@ -22,6 +22,8 @@ function hasUnitDebuff(unit, name)
     end
 end
 
+oUF.colors.smooth = {0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, }
+
 local MyPvPUpdate = function(self, event, unit)
     if (unit ~= self.unit) then return end
     
@@ -44,8 +46,6 @@ local MyPvPUpdate = function(self, event, unit)
         end
     end
 end
-
-oUF.colors.smooth = {0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, }
 -----------------------------
 -- STYLE FUNCTIONS
 -----------------------------
