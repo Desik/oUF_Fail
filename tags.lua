@@ -1,6 +1,8 @@
 local addon, ns = ...
 local cfg = ns.cfg
 
+local tags = oUF.Tags
+
 local SVal = function(val)
     if val then
         if (val >= 1e6) then
@@ -32,7 +34,7 @@ ns.colors = setmetatable({
     }, {__index = oUF.colors.power}),
 }, {__index = oUF.colors})
 
-oUF.Tags.Methods["fail:lfdrole"] = function(unit)
+tags.Methods["fail:lfdrole"] = function(unit)
     local role = UnitGroupRolesAssigned(unit)
     if role == "HEALER" then
         return "|cff8AFF30Heals|r"
@@ -42,9 +44,9 @@ oUF.Tags.Methods["fail:lfdrole"] = function(unit)
         return "|cffFF6161DPS|r"
     end
 end
-oUF.Tags.Events["fail:lfdrole"] = "PLAYER_ROLES_ASSIGNED PARTY_MEMBERS_CHANGED"
+tags.Events["fail:lfdrole"] = "PLAYER_ROLES_ASSIGNED PARTY_MEMBERS_CHANGED"
 
-oUF.Tags.Methods['fail:DDG'] = function(u)
+tags.Methods['fail:DDG'] = function(u)
     if not UnitIsConnected(u) then
         return "|cffCFCFCF D/C|r"
     elseif UnitIsGhost(u) then
@@ -53,13 +55,13 @@ oUF.Tags.Methods['fail:DDG'] = function(u)
         return "|cffCFCFCF Dead|r"
     end
 end
-oUF.Tags.Events['fail:DDG'] = 'UNIT_NAME_UPDATE UNIT_HEALTH UNIT_CONNECTION'
+tags.Events['fail:DDG'] = 'UNIT_NAME_UPDATE UNIT_HEALTH UNIT_CONNECTION'
 
-oUF.Tags.Methods['fail:hp'] = function(u)
+tags.Methods['fail:hp'] = function(u)
     if UnitIsDead(u) or UnitIsGhost(u) or not UnitIsConnected(u) then
-        return oUF.Tags.Methods['fail:DDG'](u)
+        return tags.Methods['fail:DDG'](u)
     else
-        local per = oUF.Tags.Methods['perhp'](u) .. "%" or 0
+        local per = tags.Methods['perhp'](u) .. "%" or 0
         local min, max = UnitHealth(u), UnitHealthMax(u)
         if u == "player" or u == "target" then
             if min ~= max then
@@ -72,27 +74,28 @@ oUF.Tags.Methods['fail:hp'] = function(u)
         end
     end
 end
-oUF.Tags.Events['fail:hp'] = 'UNIT_HEALTH UNIT_MAXHEALTH'
+tags.Events['fail:hp'] = 'UNIT_HEALTH UNIT_MAXHEALTH'
 
-oUF.Tags.Methods['fail:heal'] = function(u)
+tags.Methods['fail:heal'] = function(u)
     local incheal = UnitGetIncomingHeals(u, 'player') or 0
     if incheal > 0 then
         return "|cff8AFF30+" .. SVal(incheal) .. "|r"
     end
 end
-oUF.Tags.Events['fail:heal'] = 'UNIT_HEAL_PREDICTION'
+tags.Events['fail:heal'] = 'UNIT_HEAL_PREDICTION'
 
-oUF.Tags.Methods['fail:raidhp'] = function(u)
+tags.Methods['fail:raidhp'] = function(u)
     if UnitIsDead(u) or UnitIsGhost(u) or not UnitIsConnected(u) then
-        return oUF.Tags.Methods['fail:DDG'](u)
+        return tags.Methods['fail:DDG'](u)
     else
-        local per = oUF.Tags.Methods['perhp'](u) .. "%" or 0
+        local per = tags.Methods['perhp'](u) .. "%" or 0
         return per
     end
 end
-oUF.Tags.Events['fail:raidhp'] = 'UNIT_HEALTH'
+tags.Events['fail:raidhp'] = 'UNIT_HEALTH'
 
-oUF.Tags.Methods['fail:color'] = function(u, r)
+tags.Events['fail:color'] = 'UNIT_NAME_UPDATE UNIT_FACTION UNIT_HEALTH'
+tags.Methods['fail:color'] = function(u, r)
     local _, class = UnitClass(u)
     local reaction = UnitReaction(u, "player")
     
@@ -100,6 +103,8 @@ oUF.Tags.Methods['fail:color'] = function(u, r)
         return "|cffA0A0A0"
     elseif (UnitIsTapDenied(u)) then
         return hex(oUF.colors.tapped)
+    elseif (u == "pet") then
+        return hex(oUF.colors.class[class])
     elseif (UnitIsPlayer(u)) then
         return hex(oUF.colors.class[class])
     elseif reaction then
@@ -108,15 +113,14 @@ oUF.Tags.Methods['fail:color'] = function(u, r)
         return hex(1, 1, 1)
     end
 end
-oUF.Tags.Events['fail:color'] = 'UNIT_REACTION UNIT_HEALTH UNIT_HAPPINESS'
 
-oUF.Tags.Methods["fail:afkdnd"] = function(unit)
+tags.Methods["fail:afkdnd"] = function(unit)
         
         return UnitIsAFK(unit) and "|cffCFCFCF <afk>|r" or UnitIsDND(unit) and "|cffCFCFCF <dnd>|r" or ""
 end
-oUF.Tags.Events["fail:afkdnd"] = 'PLAYER_FLAGS_CHANGED UNIT_POWER_UPDATE UNIT_MAXPOWER'
+tags.Events["fail:afkdnd"] = 'PLAYER_FLAGS_CHANGED UNIT_POWER_UPDATE UNIT_MAXPOWER'
 
-oUF.Tags.Methods['fail:power'] = function(u)
+tags.Methods['fail:power'] = function(u)
     local min, max = UnitPower(u), UnitPowerMax(u)
     if min ~= max then
         return SVal(min) .. "/" .. SVal(max)
@@ -124,9 +128,9 @@ oUF.Tags.Methods['fail:power'] = function(u)
         return SVal(max)
     end
 end
-oUF.Tags.Events['fail:power'] = 'UNIT_POWER_UPDATE UNIT_MAXPOWER'
+tags.Events['fail:power'] = 'UNIT_POWER_UPDATE UNIT_MAXPOWER'
 
-oUF.Tags.Methods['fail:pp'] = function(u)
+tags.Methods['fail:pp'] = function(u)
     if u == "player" or u == "target" then
         local _, class = UnitClass(u)
         if (UnitIsPlayer(u)) then
@@ -134,9 +138,9 @@ oUF.Tags.Methods['fail:pp'] = function(u)
         end
     end
 end
-oUF.Tags.Events['fail:pp'] = 'UNIT_POWER_UPDATE UNIT_MAXPOWER'
+tags.Events['fail:pp'] = 'UNIT_POWER_UPDATE UNIT_MAXPOWER'
 
---oUF.Tags.Methods['fail:pp'] = function(u)
+--tags.Methods['fail:pp'] = function(u)
 --    if u == "player" then
 --		local _, str = UnitPowerType(u)
 --		if str then
@@ -144,8 +148,8 @@ oUF.Tags.Events['fail:pp'] = 'UNIT_POWER_UPDATE UNIT_MAXPOWER'
 --		end
 --	end
 --end
---oUF.Tags.Events['fail:pp'] = 'UNIT_POWER_UPDATE UNIT_MAXPOWER'
-oUF.Tags.Methods['fail:tpp'] = function(u)
+--tags.Events['fail:pp'] = 'UNIT_POWER_UPDATE UNIT_MAXPOWER'
+tags.Methods['fail:tpp'] = function(u)
     if u == "target" then
         local _, class = UnitClass(u)
         if (UnitIsPlayer(u)) then
@@ -153,10 +157,11 @@ oUF.Tags.Methods['fail:tpp'] = function(u)
         end
     end
 end
-oUF.Tags.Events['fail:tpp'] = 'UNIT_POWER_UPDATE UNIT_MAXPOWER'
+tags.Events['fail:tpp'] = 'UNIT_POWER_UPDATE UNIT_MAXPOWER'
 
 -- Level
-oUF.Tags.Methods["fail:level"] = function(unit)
+tags.Events["fail:level"] = "UNIT_LEVEL PLAYER_LEVEL_UP UNIT_CLASSIFICATION_CHANGED"
+tags.Methods["fail:level"] = function(unit)
         
         local c = UnitClassification(unit)
         local l = UnitLevel(unit)
@@ -190,20 +195,20 @@ oUF.Tags.Methods["fail:level"] = function(unit)
         
         return str
 end
-oUF.Tags.Events["fail:level"] = "UNIT_LEVEL PLAYER_LEVEL_UP UNIT_CLASSIFICATION_CHANGED"
 
-oUF.Tags.Methods['fail:curxp'] = function(unit)
+
+tags.Methods['fail:curxp'] = function(unit)
     return SVal(UnitXP(unit))
 end
 
-oUF.Tags.Methods['fail:maxxp'] = function(unit)
+tags.Methods['fail:maxxp'] = function(unit)
     return SVal(UnitXPMax(unit))
 end
 
-oUF.Tags.Methods['fail:perxp'] = function(unit)
+tags.Methods['fail:perxp'] = function(unit)
     return floor(UnitXP(unit) / UnitXPMax(unit) * 100 + 0.5)
 end
 
-oUF.Tags.Events['fail:curxp'] = 'PLAYER_XP_UPDATE PLAYER_LEVEL_UP'
-oUF.Tags.Events['fail:maxxp'] = 'PLAYER_XP_UPDATE PLAYER_LEVEL_UP'
-oUF.Tags.Events['fail:perxp'] = 'PLAYER_XP_UPDATE PLAYER_LEVEL_UP'
+tags.Events['fail:curxp'] = 'PLAYER_XP_UPDATE PLAYER_LEVEL_UP'
+tags.Events['fail:maxxp'] = 'PLAYER_XP_UPDATE PLAYER_LEVEL_UP'
+tags.Events['fail:perxp'] = 'PLAYER_XP_UPDATE PLAYER_LEVEL_UP'
