@@ -641,7 +641,7 @@ lib.gen_castbar = function(f)
         l:SetJustifyH("RIGHT")
         l:Hide()
         s.Lag = l
-        f:RegisterEvent("UNIT_SPELLCAST_SENT", cast.OnCastSent)
+        --  f:RegisterEvent("UNIT_SPELLCAST_SENT", cast.OnCastSent)	--removed with 8.0
     end
     s.OnUpdate = cast.OnCastbarUpdate
     s.PostCastStart = cast.PostCastStart
@@ -783,6 +783,7 @@ end
 
 -- Create Buff/Debuff Timer Function
 function CreateBuffTimer(self, elapsed)
+    local currentTime = GetTime()
     self.elapsed = (self.elapsed or 0) + elapsed
     if self.elapsed >= 0.1 then
         if not self.first then
@@ -810,6 +811,7 @@ function CreateBuffTimer(self, elapsed)
         self.elapsed = 0
     end
 end
+
 
 --[[ Generates the Buffs
 lib.createBuffs = function(f)
