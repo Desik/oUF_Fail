@@ -951,14 +951,11 @@ lib.RogueComboPoints = function(self)
             end
         end
         
-        combo[1]:SetStatusBarColor(.3, .9, .3)
-        combo[2]:SetStatusBarColor(.3, .9, .3)
-        combo[3]:SetStatusBarColor(.3, .9, .3)
-        combo[4]:SetStatusBarColor(.9, .9, 0)
-        combo[5]:SetStatusBarColor(.9, .3, .3)
-        combo[6]:SetStatusBarColor(.9, .3, .3)
-        combo[7]:SetStatusBarColor(.9, .3, .3)
-        combo[8]:SetStatusBarColor(.9, .3, .3)
+        ComboPoints[1]:SetStatusBarColor(.3, .9, .3)
+        ComboPoints[2]:SetStatusBarColor(.3, .9, .3)
+        ComboPoints[3]:SetStatusBarColor(.3, .9, .3)
+        ComboPoints[4]:SetStatusBarColor(.9, .9, 0)
+        ComboPoints[5]:SetStatusBarColor(.9, .3, .3)
         
         self.ComboPointsBar = ComboPoints
     end
