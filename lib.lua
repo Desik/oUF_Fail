@@ -172,7 +172,7 @@ lib.gen_hpstrings = function(f, unit)
         
         if f.mystyle == "player" then
             name:SetPoint("RIGHT", f, "RIGHT", 10, 6)
-            
+        
         elseif f.mystyle == "raid" or f.mystyle == "party" then
             name:SetPoint("CENTER", f, "CENTER", 0, 6)
         elseif f.mystyle == "target" or f.mystyle == "pet" then
@@ -338,16 +338,13 @@ end
 --     lfdi:SetPoint('BOTTOM', f.Health, 'TOP', 0, 4)
 --     f:Tag(lfdi, "[fail:lfdrole]")
 -- end
-
 -- phase icon
 -- lib.addPhaseIcon = function(self)
 --     local picon = self.Health:CreateTexture(nil, 'OVERLAY')
 --     picon:SetPoint('TOPRIGHT', self, 'TOPRIGHT', 40, 8)
 --     picon:SetSize(16, 16)
-    
 --     self.PhaseIndicator = picon
 -- end
-
 -- quest icon
 lib.addQuestIcon = function(self)
     local qicon = self.Health:CreateTexture(nil, 'OVERLAY')
@@ -925,33 +922,32 @@ end
 lib.RogueComboPoints = function(self)
     if (playerClass == "ROGUE" or playerClass == "DRUID") then
         
-        local combo = CreateFrame("Frame", nil, self)
-        combo:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", 0, -5)
-        combo:SetHeight(8)
-        combo:SetWidth(self:GetWidth())
+        local ComboPoints = CreateFrame("Frame", nil, self)
+        ComboPoints:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", 0, -5)
+        ComboPoints:SetHeight(8)
+        ComboPoints:SetWidth(self:GetWidth())
         
-        for i = 1, 8 do
-            combo[i] = CreateFrame("StatusBar", self:GetName() .. "_CPoints" .. i, self)
-            combo[i]:SetHeight(8)
-            combo[i]:SetStatusBarTexture(cfg.statusbar_texture)
-            combo[i]:SetFrameLevel(10)
-            combo[i].bg = combo[i]:CreateTexture(nil, "BORDER")
-            combo[i].bg:SetTexture(cfg.statusbar_texture)
-            combo[i].bg:SetPoint("TOPLEFT", combo[i], "TOPLEFT", 0, 0)
-            combo[i].bg:SetPoint("BOTTOMRIGHT", combo[i], "BOTTOMRIGHT", 0, 0)
-            combo[i].bg.multiplier = 0.3
+        for i = 1, 5 do
+            ComboPoints[i] = CreateFrame("StatusBar", self:GetName() .. "_CPoints" .. i, self)
+            ComboPoints[i]:SetHeight(8)
+            ComboPoints[i]:SetStatusBarTexture(cfg.statusbar_texture)
+            ComboPoints[i]:SetFrameLevel(10)
+            ComboPoints[i].bg = ComboPoints[i]:CreateTexture(nil, "BORDER")
+            ComboPoints[i].bg:SetTexture(cfg.statusbar_texture)
+            ComboPoints[i].bg:SetPoint("TOPLEFT", ComboPoints[i], "TOPLEFT", 0, 0)
+            ComboPoints[i].bg:SetPoint("BOTTOMRIGHT", ComboPoints[i], "BOTTOMRIGHT", 0, 0)
+            ComboPoints[i].bg.multiplier = 0.3
             
-            local h = CreateFrame("Frame", nil, combo[i])
+            local h = CreateFrame("Frame", nil, ComboPoints[i])
             h:SetFrameLevel(1)
             h:SetPoint("TOPLEFT", -5, 5)
             h:SetPoint("BOTTOMRIGHT", 5, -5)
             lib.gen_classback(h)
             
-            
             if (i == 1) then
-                combo[i]:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", 0, -5)
+                ComboPoints[i]:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", 0, -5)
             else
-                combo[i]:SetPoint('TOPLEFT', combo[i - 1], 'TOPRIGHT', 2, 0)
+                ComboPoints[i]:SetPoint('TOPLEFT', ComboPoints[i - 1], 'TOPRIGHT', 2, 0)
             end
         end
         
@@ -964,7 +960,7 @@ lib.RogueComboPoints = function(self)
         combo[7]:SetStatusBarColor(.9, .3, .3)
         combo[8]:SetStatusBarColor(.9, .3, .3)
         
-        self.FailCPoints = combo
+        self.ComboPointsBar = ComboPoints
     end
 end
 
@@ -1206,33 +1202,33 @@ local function WeapEnchantIcon(self, icon, icons)
 
 end
 
-    local CreateEnchantTimer = function(self, icons)
-        for i = 1, 2 do
-            local icon = icons[i]
-            if icon.expTime then
-                icon.timeLeft = icon.expTime - GetTime()
-                icon.time:Show()
-            else
-                icon.time:Hide()
-            end
-            icon:SetScript("OnUpdate", CreateAuraTimer)
+local CreateEnchantTimer = function(self, icons)
+    for i = 1, 2 do
+        local icon = icons[i]
+        if icon.expTime then
+            icon.timeLeft = icon.expTime - GetTime()
+            icon.time:Show()
+        else
+            icon.time:Hide()
         end
+        icon:SetScript("OnUpdate", CreateAuraTimer)
     end
-    
-    lib.gen_WeaponEnchant = function(self)
-        if IsAddOnLoaded("oUF_WeaponEnchant") then
-            self.Enchant = CreateFrame("Frame", nil, self)
-            self.Enchant:SetSize(64, 32)
-            self.Enchant:SetPoint("TOPRIGHT", oUF_failPlayer.Power, "BOTTOMLEFT", 0, 0)
-            self.Enchant.size = 32
-            self.Enchant.spacing = 2
-            self.Enchant.initialAnchor = "TOPRIGHT"
-            self.Enchant["growth-x"] = "LEFT"
-            self.Enchant:SetFrameLevel(10)
-            self.PostCreateEnchantIcon = WeapEnchantIcon
-            self.PostUpdateEnchantIcons = CreateEnchantTimer
-        end
+end
+
+lib.gen_WeaponEnchant = function(self)
+    if IsAddOnLoaded("oUF_WeaponEnchant") then
+        self.Enchant = CreateFrame("Frame", nil, self)
+        self.Enchant:SetSize(64, 32)
+        self.Enchant:SetPoint("TOPRIGHT", oUF_failPlayer.Power, "BOTTOMLEFT", 0, 0)
+        self.Enchant.size = 32
+        self.Enchant.spacing = 2
+        self.Enchant.initialAnchor = "TOPRIGHT"
+        self.Enchant["growth-x"] = "LEFT"
+        self.Enchant:SetFrameLevel(10)
+        self.PostCreateEnchantIcon = WeapEnchantIcon
+        self.PostUpdateEnchantIcons = CreateEnchantTimer
     end
+end
 
 -- Power Bar Arrow Function
 -- Special thanks to Zork and Rainrider for the initial implementation

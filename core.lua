@@ -102,10 +102,8 @@ local UnitSpecific = {
             -- This makes oUF update the information on forced updates.
             table.insert(self.__elements, MyPvPUpdate)
             -- Class Bars
-            if cfg.showRunebar then lib.genRunes(self) end
             if cfg.showClassbar then lib.gen_Classbar(self) end
             lib.RogueComboPoints(self)
-            lib.gen_AltPowerBar(self)
         
         end,
         
@@ -125,7 +123,6 @@ local UnitSpecific = {
             lib.gen_RaidMark(self)
             lib.gen_combat_feedback(self)
             lib.RogueComboPoints(self)
-            
             --style specific stuff
             self.Health.frequentUpdates = true
             self.Health.colorSmooth = true
@@ -163,40 +160,6 @@ local UnitSpecific = {
             if cfg.showTargetDebuffs then lib.createDebuffs(self) end
         end,
         
-        focus = function(self, ...)
-            
-            self.mystyle = "focus"
-            
-            -- Size and Scale
-            self:SetScale(cfg.scale)
-            self:SetSize(140, 30)
-            
-            -- Generate Bars
-            lib.gen_hpbar(self)
-            lib.gen_hpstrings(self)
-            lib.gen_highlight(self)
-            lib.gen_ppbar(self)
-            lib.gen_RaidMark(self)
-            
-            --style specific stuff
-            self.Health.frequentUpdates = true
-            self.Health.Smooth = true
-            self.Health.colorSmooth = true
-            -- self.Health.bg.multiplier = 0.3
-            self.Power.Smooth = true
-            self.Power.colorTapping = true
-            self.Power.colorDisconnected = true
-            self.Power.colorHappiness = false
-            self.Power.colorClass = true
-            self.Power.colorReaction = true
-            self.Power.colorHealth = true
-            self.Power.bg.multiplier = 0.5
-            if cfg.ShowExtraUnitArrows then self.Power.PostUpdate = lib.setClassArrowColor end
-            lib.gen_castbar(self)
-            lib.HealPred(self)
-            lib.createDebuffs(self)
-        end,
-        
         targettarget = function(self, ...)
             
             self.mystyle = "tot"
@@ -231,37 +194,6 @@ local UnitSpecific = {
         
         end,
         
-        focustarget = function(self, ...)
-            
-            self.mystyle = "focustarget"
-            
-            -- Size and Scale
-            self:SetScale(cfg.scale)
-            self:SetSize(140, 30)
-            
-            -- Generate Bars
-            lib.gen_hpbar(self)
-            lib.gen_hpstrings(self)
-            lib.gen_highlight(self)
-            lib.gen_ppbar(self)
-            lib.gen_RaidMark(self)
-            
-            --style specific stuff
-            self.Health.frequentUpdates = true
-            self.Health.colorSmooth = true
-            self.Health.colorClass = true
-            self.Health.Smooth = true
-            self.Power.Smooth = true
-            self.Power.colorTapping = true
-            self.Power.colorDisconnected = true
-            self.Power.colorPower = true
-            self.Power.colorReaction = true
-            self.Power.bg.multiplier = 0.5
-            if cfg.ShowExtraUnitArrows then self.Power.PostUpdate = lib.setPowerArrowColor end
-            lib.gen_castbar(self)
-            lib.HealPred(self)
-        
-        end,
         
         -- Pet style
         pet = function(self, ...)
@@ -303,7 +235,7 @@ local UnitSpecific = {
         raid = function(self, ...)
             
             self.mystyle = "raid"
-
+            
             self.Range = {
                 insideAlpha = 1,
                 outsideAlpha = .3,
@@ -336,8 +268,8 @@ local UnitSpecific = {
             self.Health.PostUpdate = lib.PostUpdateRaidFrame
             self:RegisterEvent('PLAYER_TARGET_CHANGED', lib.ChangedTarget, true)
             self:RegisterEvent('GROUP_ROSTER_UPDATE', lib.ChangedTarget, true)
-            --self:RegisterEvent("UNIT_THREAT_LIST_UPDATE", lib.UpdateThreat, true)
-            --self:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE", lib.UpdateThreat, true)
+        --self:RegisterEvent("UNIT_THREAT_LIST_UPDATE", lib.UpdateThreat, true)
+        --self:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE", lib.UpdateThreat, true)
         end,
         
         party = function(self, ...)
@@ -356,8 +288,7 @@ local UnitSpecific = {
             lib.gen_ppbar(self)
             lib.gen_RaidMark(self)
             lib.ReadyCheck(self)
-           -- lib.gen_LFDRole(self)
-            
+            -- lib.gen_LFDRole(self)
             --style specific stuff
             self.Health.frequentUpdates = true
             self.Health.colorSmooth = true
@@ -378,8 +309,8 @@ local UnitSpecific = {
             self.Health.PostUpdate = lib.PostUpdateRaidFrame
             self:RegisterEvent('PLAYER_TARGET_CHANGED', lib.ChangedTarget, true)
             self:RegisterEvent('GROUP_ROSTER_UPDATE', lib.ChangedTarget, true)
-            -- self:RegisterEvent("UNIT_THREAT_LIST_UPDATE", lib.UpdateThreat, true)
-            -- self:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE", lib.UpdateThreat, true)
+        -- self:RegisterEvent("UNIT_THREAT_LIST_UPDATE", lib.UpdateThreat, true)
+        -- self:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE", lib.UpdateThreat, true)
         end,
 }
 
@@ -458,8 +389,6 @@ oUF:Factory(function(self)
         self:Spawn('target'):SetPoint("CENTER", UIParent, cfg.TargetRelativePoint, cfg.TargetX, cfg.TargetY)
         if cfg.showtot then self:Spawn('targettarget'):SetPoint("BOTTOMLEFT", oUF_failTarget, cfg.TotRelativePoint, cfg.TotX, cfg.TotY) end
         if cfg.showpet then self:Spawn('pet'):SetPoint("TOPRIGHT", oUF_failPlayer, "TOPLEFT", -10, 0) end
-        if cfg.showfocus then self:Spawn('focus'):SetPoint("BOTTOMRIGHT", oUF_failPlayer, cfg.FocusRelativePoint, cfg.FocusX, cfg.FocusY) end
-        if cfg.showfocustarget then self:Spawn('focustarget'):SetPoint("BOTTOMLEFT", oUF_failFocus, "TOPRIGHT", cfg.FocusTargetX, cfg.FocusTargetY) end
         
         -- Party Frames
         if cfg.ShowParty then
@@ -480,7 +409,10 @@ oUF:Factory(function(self)
                     "oUF-initialConfigFunction", ([[
 				self:SetWidth(%d)
 				self:SetHeight(%d)
-			]] ):format(128, 25))
+			]]
+                    
+                    
+                    ):format(128, 25))
                 party:SetScale(cfg.raidScale)
                 party:SetPoint('CENTER', UIParent, 'CENTER', cfg.PartyX, cfg.PartyY)
             else
@@ -492,7 +424,10 @@ oUF:Factory(function(self)
                     "oUF-initialConfigFunction", ([[
 				self:SetWidth(%d)
 				self:SetHeight(%d)
-			]]):format(128, 25))
+			]]
+                    
+                    
+                    ):format(128, 25))
                 party:SetScale(cfg.raidScale)
                 party:SetPoint('CENTER', UIParent, 'CENTER', cfg.PartyX, cfg.PartyY)
             end
@@ -521,7 +456,10 @@ oUF:Factory(function(self)
                 "oUF-initialConfigFunction", ([[
 		self:SetWidth(%d)
 		self:SetHeight(%d)
-		]] ):format(96, 25))
+		]]
+                
+                
+                ):format(96, 25))
             raid10:SetScale(cfg.raidScale)
             raid10:SetPoint('CENTER', UIParent, 'CENTER', cfg.RaidX + 200, cfg.RaidY + 100)
             
@@ -543,7 +481,10 @@ oUF:Factory(function(self)
                 "oUF-initialConfigFunction", ([[
 		self:SetWidth(%d)
 		self:SetHeight(%d)
-		]] ):format(80, 25))
+		]]
+                
+                
+                ):format(80, 25))
             raid25:SetScale(cfg.raidScale)
             raid25:SetPoint('CENTER', UIParent, 'CENTER', cfg.RaidX + 80, cfg.RaidY)
             
@@ -565,7 +506,10 @@ oUF:Factory(function(self)
                 "oUF-initialConfigFunction", ([[
 		self:SetWidth(%d)
 		self:SetHeight(%d)
-		]] ):format(64, 25))
+		]]
+                
+                
+                ):format(64, 25))
             --raid40:SetScale(cfg.raidScale)
             raid40:SetPoint('CENTER', UIParent, 'CENTER', cfg.RaidX, cfg.RaidY)
         

@@ -63,12 +63,10 @@ cfg.enableDebuffHighlight = true -- enable *dispelable* debuff highlight for rai
 cfg.showRaidDebuffs = true -- enable important debuff icons to show on raid units
 
 -- Misc
-cfg.showRunebar = true -- show DK's rune bar
 cfg.showClassbar = true -- Shadow orbs, soul shards, holy power and chi
 cfg.RCheckIcon = true -- show raid check icon
 cfg.Castbars = true -- use built-in castbars
 cfg.ShowIncHeals = true -- Show incoming heals in player and raid frames
-cfg.showLFDIcons = true -- Show dungeon role icons in raid/party
 
 cfg.statusbar_texture = mediaFolder .. "healthbar"
 cfg.powerbar_texture = mediaFolder .. "powerbar"

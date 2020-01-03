@@ -14,22 +14,21 @@ local CanDispel = {
 
 local dispellist = CanDispel[playerClass] or {}
 
-local function GetDebuffType(unit, filter, filterTable)
+local function GetDebuffType(unit, filter)
 	if not unit or not UnitCanAssist("player", unit) then return nil end
 	local i = 1
 	while true do
 		local name, texture, _, debufftype, _,_,_,_,_, spellID = UnitAura(unit, i, "HARMFUL")
 		if not texture then break end
-		local filterSpell = filterTable[spellID] or filterTable[name]
-
-		if(filterTable and filterSpell and filterSpell.enable) then
-			return debufftype, texture, true, filterSpell.style, filterSpell.color
-		elseif debufftype and (not filter or (filter and dispellist[debufftype])) then
+		if debufftype and not filter or (filter and dispellist[debufftype]) then
 			return debufftype, texture
 		end
 		i = i + 1
 	end
 end
+
+
+
 
 local function Update(object, event, unit)
 	if unit ~= object.unit then return; end

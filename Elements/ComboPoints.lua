@@ -2,88 +2,94 @@ local _, ns = ...
 local oUF = ns.oUF or oUF
 assert(oUF, "ComboPoints was unable to locate oUF install")
 
-local UnitPower, UnitPowerMax = UnitPower, UnitPowerMax
-local MAX_COMBO_POINTS = MAX_COMBO_POINTS
-local cur, max, oldMax;
+local GetComboPoints = GetComboPoints
+
+local Colors = {
+	[1] = {193/255, 65/255, 68/255, 1},
+	[2] = {193/255, 65/255, 68/255, 1},
+	[3] = {193/255, 65/255, 68/255, 1},
+	[4] = {193/255, 65/255, 68/255, 1},
+	[5] = {185/255, 48/255, 15/255, 1},
+}
 
 local Update = function(self, event, unit, powerType)
-    if unit and (unit ~= 'player') then return end
-    if powerType and powerType ~= 'COMBO_POINTS' then return end
-    
-    local cpoints = self.FailCPoints
-    if (cpoints.PreUpdate) then
-        cpoints:PreUpdate()
-    end
-    
-    if UnitPower('player', 4) >= 1 then
-        cur = UnitPower('vehicle', 4)
-        max = MAX_COMBO_POINTS
-    else
-        cur = UnitPower('player', 4)
-        max = UnitPowerMax('player', 4)
-    end
-    
-    if not oldMax or max ~= oldMax then
-        local width = cpoints:GetWidth()
-        for i = 1, max do
-            cpoints[i]:SetWidth(width / max - 2)
-        end
-        if oldMax and max < oldMax then
-            for i = max + 1, oldMax do
-                cpoints[i]:Hide()
-            end
-        end
-        oldMax = max
-    end
-    
-    for i = 1, max do
-        if i <= cur then
-            cpoints[i]:Show()
-        else
-            cpoints[i]:Hide()
-        end
-    end
-    
-    if (cpoints.PostUpdate) then
-        return cpoints:PostUpdate(cur)
-    end
+	if(self.unit ~= unit and (powerType and (powerType ~= 'COMBO_POINTS'))) then return end
+
+	local cpb = self.ComboPointsBar
+	local points
+	local max = UnitPowerMax("player", Enum.PowerType.ComboPoints)
+	local currentmax = 5
+
+	if cpb.PreUpdate then
+		cpb:PreUpdate(points)
+	end
+	
+	points = GetComboPoints("player", "target")
+
+	if points then
+		-- update combos display
+		for i = 1, 5 do
+			if i <= points then
+				cpb[i]:SetAlpha(1)
+			else
+				cpb[i]:SetAlpha(.1)
+			end
+		end
+	end
+
+	if points > 0 then
+		cpb:Show()
+	else
+		cpb:Hide()
+	end
+
+	if cpb.PostUpdate then
+		cpb:PostUpdate(points)
+	end
 end
 
 local Path = function(self, ...)
-    return (self.FailCPoints.Override or Update)(self, ...)
+	return (self.ComboPointsBar.Override or Update) (self, ...)
 end
 
 local ForceUpdate = function(element)
-    return Path(element.__owner, 'ForceUpdate', element.__owner.unit, nil)
+	return Path(element.__owner, 'ForceUpdate', element.__owner.unit, "COMBO_POINTS")
 end
 
-local Enable = function(self)
-    local cpoints = self.FailCPoints
-    if (cpoints) then
-        cpoints.__owner = self
-        cpoints.ForceUpdate = ForceUpdate
-        
-        self:RegisterEvent('UNIT_POWER_FREQUENT', Path)
-        self:RegisterEvent('UNIT_MAXPOWER', Path)
-        
-        for index = 1, MAX_COMBO_POINTS do
-            local cpoint = cpoints[index]
-            if (cpoint:IsObjectType 'Texture' and not cpoint:GetTexture()) then
-                cpoint:SetTexture [[Interface\ComboFrame\ComboPoint]]
-                cpoint:SetTexCoord(0, 0.375, 0, 1)
-            end
-        end
-        
-        return true
-    end
+local Enable = function(self, unit)
+	local cpb = self.ComboPointsBar
+	if(cpb) then
+		cpb.__owner = self
+		cpb.ForceUpdate = ForceUpdate
+
+		self:RegisterEvent('UNIT_POWER_UPDATE', Path, true)
+		self:RegisterEvent('PLAYER_TARGET_CHANGED', Path, true)
+
+		for i = 1, 5 do
+			local Point = cpb[i]
+			if not Point:GetStatusBarTexture() then
+				Point:SetStatusBarTexture([=[Interface\TargetingFrame\UI-StatusBar]=])
+			end
+
+			Point:SetStatusBarColor(unpack(Colors[i]))
+			Point:SetFrameLevel(cpb:GetFrameLevel() + 1)
+			Point:GetStatusBarTexture():SetHorizTile(false)
+			
+			Point.Width = Point:GetWidth()
+		end
+		
+		cpb:Hide()
+
+		return true
+	end
 end
 
 local Disable = function(self)
-    local cpoints = self.FailCPoints
-    if (cpoints) then
-        self:UnregisterEvent('UNIT_POWER_FREQUENT', Path)
-        self:UnregisterEvent('UNIT_MAXPOWER', Path)
-    end
+	local cpb = self.ComboPointsBar
+	if(cpb) then
+		self:UnregisterEvent('UNIT_POWER_UPDATE', Path)
+		self:UnregisterEvent('PLAYER_TARGET_CHANGED', Path)
+	end
 end
 
-oUF:AddElement('FailCPoints', Path, Enable, Disable)
+oUF:AddElement('ComboPointsBar', Path, Enable, Disable)
