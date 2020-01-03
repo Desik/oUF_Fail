@@ -333,20 +333,20 @@ lib.gen_InfoIcons = function(f)
 end
 
 -- LFG Role Indicator
-lib.gen_LFDRole = function(f)
-    local lfdi = lib.gen_fontstring(f.Health, cfg.smallfont, 10, "THINOUTLINE")
-    lfdi:SetPoint('BOTTOM', f.Health, 'TOP', 0, 4)
-    f:Tag(lfdi, "[fail:lfdrole]")
-end
+-- lib.gen_LFDRole = function(f)
+--     local lfdi = lib.gen_fontstring(f.Health, cfg.smallfont, 10, "THINOUTLINE")
+--     lfdi:SetPoint('BOTTOM', f.Health, 'TOP', 0, 4)
+--     f:Tag(lfdi, "[fail:lfdrole]")
+-- end
 
 -- phase icon
-lib.addPhaseIcon = function(self)
-    local picon = self.Health:CreateTexture(nil, 'OVERLAY')
-    picon:SetPoint('TOPRIGHT', self, 'TOPRIGHT', 40, 8)
-    picon:SetSize(16, 16)
+-- lib.addPhaseIcon = function(self)
+--     local picon = self.Health:CreateTexture(nil, 'OVERLAY')
+--     picon:SetPoint('TOPRIGHT', self, 'TOPRIGHT', 40, 8)
+--     picon:SetSize(16, 16)
     
-    self.PhaseIndicator = picon
-end
+--     self.PhaseIndicator = picon
+-- end
 
 -- quest icon
 lib.addQuestIcon = function(self)

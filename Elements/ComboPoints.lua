@@ -7,7 +7,7 @@ local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 local cur, max, oldMax;
 
 local Update = function(self, event, unit, powerType)
-    if unit and (unit ~= 'player' and unit ~= 'vehicle') then return end
+    if unit and (unit ~= 'player') then return end
     if powerType and powerType ~= 'COMBO_POINTS' then return end
     
     local cpoints = self.FailCPoints
@@ -15,7 +15,7 @@ local Update = function(self, event, unit, powerType)
         cpoints:PreUpdate()
     end
     
-    if UnitHasVehicleUI('player') and UnitPower('vehicle', 4) >= 1 then
+    if UnitPower('player', 4) >= 1 then
         cur = UnitPower('vehicle', 4)
         max = MAX_COMBO_POINTS
     else

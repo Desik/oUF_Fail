@@ -336,8 +336,8 @@ local UnitSpecific = {
             self.Health.PostUpdate = lib.PostUpdateRaidFrame
             self:RegisterEvent('PLAYER_TARGET_CHANGED', lib.ChangedTarget, true)
             self:RegisterEvent('GROUP_ROSTER_UPDATE', lib.ChangedTarget, true)
-            self:RegisterEvent("UNIT_THREAT_LIST_UPDATE", lib.UpdateThreat)
-            self:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE", lib.UpdateThreat)
+            --self:RegisterEvent("UNIT_THREAT_LIST_UPDATE", lib.UpdateThreat, true)
+            --self:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE", lib.UpdateThreat, true)
         end,
         
         party = function(self, ...)
@@ -356,7 +356,7 @@ local UnitSpecific = {
             lib.gen_ppbar(self)
             lib.gen_RaidMark(self)
             lib.ReadyCheck(self)
-            lib.gen_LFDRole(self)
+           -- lib.gen_LFDRole(self)
             
             --style specific stuff
             self.Health.frequentUpdates = true
@@ -374,12 +374,12 @@ local UnitSpecific = {
             lib.HealPred(self)
             lib.debuffHighlight(self)
             lib.raidDebuffs(self)
-            lib.addPhaseIcon(self)
+            --lib.addPhaseIcon(self)
             self.Health.PostUpdate = lib.PostUpdateRaidFrame
             self:RegisterEvent('PLAYER_TARGET_CHANGED', lib.ChangedTarget, true)
-            self:RegisterEvent('GROUP_ROSTER_UPDATE', lib.ChangedTarget)
-            self:RegisterEvent("UNIT_THREAT_LIST_UPDATE", lib.UpdateThreat)
-            self:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE", lib.UpdateThreat)
+            self:RegisterEvent('GROUP_ROSTER_UPDATE', lib.ChangedTarget, true)
+            -- self:RegisterEvent("UNIT_THREAT_LIST_UPDATE", lib.UpdateThreat, true)
+            -- self:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE", lib.UpdateThreat, true)
         end,
 }
 

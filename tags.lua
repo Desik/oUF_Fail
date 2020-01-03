@@ -25,17 +25,17 @@ local function hex(r, g, b)
 end
 
 --something is messing up here havent sorted it out yet--
-tags.Events["fail:lfdrole"] = "GROUP_ROSTER_UPDATE PLAYER_ROLES_ASSIGNED"
-tags.Methods["fail:lfdrole"] = function(unit)
-    local role = UnitGroupRolesAssigned(unit)
-    if role == "HEALER" then
-        return "|cff8AFF30Heals|r"
-    elseif role == "TANK" then
-        return "|cffFFF130Tank|r"
-    elseif role == "DAMAGER" then
-        return "|cffFF6161DPS|r"
-    end
-end
+-- tags.Events["fail:lfdrole"] = "GROUP_ROSTER_UPDATE PLAYER_ROLES_ASSIGNED"
+-- tags.Methods["fail:lfdrole"] = function(unit)
+--     local role = UnitGroupRolesAssigned(unit)
+--     if role == "HEALER" then
+--         return "|cff8AFF30Heals|r"
+--     elseif role == "TANK" then
+--         return "|cffFFF130Tank|r"
+--     elseif role == "DAMAGER" then
+--         return "|cffFF6161DPS|r"
+--     end
+-- end
 
 tags.Events["fail:perhp"] = 'UNIT_HEALTH UNIT_MAXHEALTH'
 tags.Methods["fail:perhp"] = function(u)
