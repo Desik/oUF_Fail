@@ -80,7 +80,7 @@ local UnitSpecific = {
             self.Health.frequentUpdates = true
             self.Health.colorSmooth = true
             self.Health.Smooth = true
-            -- self.Health.bg.multiplier = 0.2
+            --self.Health.bg.multiplier = 0.2
             self.Power.colorPower = true
             --self.Power.arrow.colorPower = true
             self.Power.Smooth = true
@@ -261,164 +261,132 @@ local UnitSpecific = {
             lib.gen_castbar(self)
             lib.HealPred(self)
         
-        end}
-
--- Pet style
-local function CreatePetStyle(self, unit)
-    
-    self.mystyle = "pet"
-    self.Range = {
-        insideAlpha = 1,
-        outsideAlpha = .3,
-    }
-    -- Size and Scale
-    self:SetScale(cfg.scale)
-    self:SetSize(90, 30)
-    
-    -- Generate Bars
-    lib.gen_hpbar(self)
-    lib.gen_hpstrings(self)
-    lib.gen_highlight(self)
-    lib.gen_ppbar(self)
-    lib.gen_RaidMark(self)
-    
-    --style specific stuff
-    self.Health.frequentUpdates = true
-    self.Health.colorSmooth = true
-    self.Health.Smooth = true
-    -- self.Health.bg.multiplier = 0.3
-    self.Power.Smooth = true
-    self.Power.colorTapping = true
-    self.Power.colorDisconnected = true
-    self.Power.colorHappiness = false
-    self.Power.colorClass = true
-    self.Power.colorReaction = true
-    self.Power.colorHealth = true
-    self.Power.bg.multiplier = 0.5
-    lib.gen_castbar(self)
-    lib.HealPred(self)
-
-end
-
-
--- Party style
-local function CreatePartyStyle(self)
-    self.menu = lib.menu
-    self:RegisterForClicks("AnyUp")
-    self:SetAttribute("*type2", "menu")
-    self:SetScript("OnEnter", UnitFrame_OnEnter)
-    self:SetScript("OnLeave", UnitFrame_OnLeave)
-    if self:GetAttribute("unitsuffix") == "pet" then
-        return CreatePartyPetStyle(self)
-    end
-    self.mystyle = "party"
-    self.Range = {
-        insideAlpha = 1,
-        outsideAlpha = .3,
-    }
-    -- Generate Bars
-    lib.gen_hpbar(self)
-    lib.gen_hpstrings(self)
-    lib.gen_highlight(self)
-    lib.gen_ppbar(self)
-    lib.gen_RaidMark(self)
-    lib.ReadyCheck(self)
-    lib.gen_LFDRole(self)
-    
-    --style specific stuff
-    self.Health.frequentUpdates = true
-    self.Health.colorSmooth = true
-    self.Health.Smooth = true
-    self.Power.Smooth = true
-    -- self.Health.bg.multiplier = 0.3
-    self.Power.colorClass = true
-    self.Power.bg.multiplier = 0.5
-    self.Power.arrow.colorPower = true
-    if cfg.ShowExtraUnitArrows then self.Power.PostUpdate = lib.setClassArrowColor end
-    lib.gen_InfoIcons(self)
-    lib.CreateTargetBorder(self)
-    lib.CreateThreatBorder(self)
-    lib.HealPred(self)
-    lib.debuffHighlight(self)
-    lib.raidDebuffs(self)
-    
-    self.Health.PostUpdate = lib.PostUpdateRaidFrame
-    self:RegisterEvent('GROUP_ROSTER_UPDATE', lib.ChangedTarget)
-    self:RegisterEvent("UNIT_THREAT_LIST_UPDATE", lib.UpdateThreat)
-    self:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE", lib.UpdateThreat)
-end
-
--- Raid frames layout
-local CreateRaidStyle = function(self, unit, isSingle)
-    self.menu = lib.menu
-    self:RegisterForClicks("AnyUp")
-    self:SetAttribute("*type2", "menu")
-    self:SetScript("OnEnter", UnitFrame_OnEnter)
-    self:SetScript("OnLeave", UnitFrame_OnLeave)
-    self.mystyle = "raid"
-    self.Range = {
-        insideAlpha = 1,
-        outsideAlpha = .3,
-    }
-    -- Generate Bars
-    lib.gen_hpbar(self)
-    lib.gen_hpstrings(self)
-    lib.gen_highlight(self)
-    lib.gen_ppbar(self)
-    lib.gen_RaidMark(self)
-    lib.ReadyCheck(self)
-    
-    --style specific stuff
-    self.Health.frequentUpdates = true
-    self.Health.colorSmooth = true
-    --self.Health.Smooth = true
-    --self.Power.Smooth = true
-    -- self.Health.bg.multiplier = 0.3
-    self.Power.colorClass = true
-    self.Power.bg.multiplier = 0.5
-    lib.gen_InfoIcons(self)
-    lib.CreateTargetBorder(self)
-    lib.CreateThreatBorder(self)
-    lib.HealPred(self)
-    lib.debuffHighlight(self)
-    lib.raidDebuffs(self)
-    lib.createAuraWatch(self, unit)
-    
-    self.Health.PostUpdate = lib.PostUpdateRaidFrame
-    self:RegisterEvent('GROUP_ROSTER_UPDATE', lib.ChangedTarget)
-    self:RegisterEvent("UNIT_THREAT_LIST_UPDATE", lib.UpdateThreat)
-    self:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE", lib.UpdateThreat)
-end
-
-
--- The Shared Style Function
-local GlobalStyle = function(self, unit, isSingle)
+        end,
         
-        self.menu = lib.spawnMenu
-        self:RegisterForClicks('AnyDown')
+        -- Pet style
+        pet = function(self, ...)
+            local _, playerClass = UnitClass("player")
+            
+            self.mystyle = "pet"
+            self.Range = {
+                insideAlpha = 1,
+                outsideAlpha = .3,
+            }
+            -- Size and Scale
+            self:SetScale(cfg.scale)
+            self:SetSize(90, 30)
+            
+            -- Generate Bars
+            lib.gen_hpbar(self)
+            lib.gen_hpstrings(self)
+            lib.gen_highlight(self)
+            lib.gen_ppbar(self)
+            lib.gen_RaidMark(self)
+            
+            --style specific stuff
+            self.Health.frequentUpdates = true
+            self.Health.colorSmooth = true
+            self.Health.Smooth = true
+            -- self.Health.bg.multiplier = 0.3
+            self.Power.Smooth = true
+            self.Power.colorTapping = true
+            self.Power.colorDisconnected = true
+            self.Power.colorHappiness = false
+            self.Power.colorClass = true
+            self.Power.colorReaction = true
+            self.Power.colorHealth = true
+            self.Power.bg.multiplier = 0.5
+            lib.gen_castbar(self)
+            lib.HealPred(self)
         
-        -- Call Unit Specific Styles
-        if (UnitSpecific[unit]) then
-            return UnitSpecific[unit](self)
-        end
-end
+        end,
+        raid = function(self, ...)
+            
+            self.mystyle = "raid"
 
--- The Shared Style Function for Party and Raid
-local GroupGlobalStyle = function(self, unit)
+            self.Range = {
+                insideAlpha = 1,
+                outsideAlpha = .3,
+            }
+            
+            -- Generate Bars
+            lib.gen_hpbar(self)
+            lib.gen_hpstrings(self)
+            lib.gen_highlight(self)
+            lib.gen_ppbar(self)
+            lib.gen_RaidMark(self)
+            lib.ReadyCheck(self)
+            
+            --style specific stuff
+            self.Health.frequentUpdates = true
+            self.Health.colorSmooth = true
+            --self.Health.Smooth = true
+            --self.Power.Smooth = true
+            -- self.Health.bg.multiplier = 0.3
+            self.Power.colorClass = true
+            self.Power.bg.multiplier = 0.5
+            lib.gen_InfoIcons(self)
+            lib.CreateTargetBorder(self)
+            lib.CreateThreatBorder(self)
+            lib.HealPred(self)
+            lib.debuffHighlight(self)
+            lib.raidDebuffs(self)
+            lib.createAuraWatch(self, unit)
+            
+            self.Health.PostUpdate = lib.PostUpdateRaidFrame
+            self:RegisterEvent('PLAYER_TARGET_CHANGED', lib.ChangedTarget, true)
+            self:RegisterEvent('GROUP_ROSTER_UPDATE', lib.ChangedTarget, true)
+            self:RegisterEvent("UNIT_THREAT_LIST_UPDATE", lib.UpdateThreat)
+            self:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE", lib.UpdateThreat)
+        end,
         
-        self.menu = lib.spawnMenu
-        self:RegisterForClicks('AnyDown')
-        
-        -- Call Unit Specific Styles
-        if (UnitSpecific[unit]) then
-            return UnitSpecific[unit](self)
-        end
-end
+        party = function(self, ...)
+            
+            self.mystyle = "party"
+            
+            self.Range = {
+                insideAlpha = 1,
+                outsideAlpha = .3,
+            }
+            
+            -- Generate Bars
+            lib.gen_hpbar(self)
+            lib.gen_hpstrings(self)
+            lib.gen_highlight(self)
+            lib.gen_ppbar(self)
+            lib.gen_RaidMark(self)
+            lib.ReadyCheck(self)
+            lib.gen_LFDRole(self)
+            
+            --style specific stuff
+            self.Health.frequentUpdates = true
+            self.Health.colorSmooth = true
+            self.Health.Smooth = true
+            self.Power.Smooth = true
+            -- self.Health.bg.multiplier = 0.3
+            self.Power.colorClass = true
+            self.Power.bg.multiplier = 0.5
+            self.Power.arrow.colorPower = true
+            if cfg.ShowExtraUnitArrows then self.Power.PostUpdate = lib.setClassArrowColor end
+            lib.gen_InfoIcons(self)
+            lib.CreateTargetBorder(self)
+            lib.CreateThreatBorder(self)
+            lib.HealPred(self)
+            lib.debuffHighlight(self)
+            lib.raidDebuffs(self)
+            lib.addPhaseIcon(self)
+            self.Health.PostUpdate = lib.PostUpdateRaidFrame
+            self:RegisterEvent('PLAYER_TARGET_CHANGED', lib.ChangedTarget, true)
+            self:RegisterEvent('GROUP_ROSTER_UPDATE', lib.ChangedTarget)
+            self:RegisterEvent("UNIT_THREAT_LIST_UPDATE", lib.UpdateThreat)
+            self:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE", lib.UpdateThreat)
+        end,
+}
 
 -- Boss frames layout
-local function CreateBossStyle(self, unit)
+local function CreateUnitFrame(self, unit)
     
-    self.mystyle = "failBoss"
+    self.mystyle = "boss"
     
     self.Range = {
         insideAlpha = 1,
@@ -453,66 +421,35 @@ if cfg.showBossDebuffs then lib.createDebuffs(self) end
 ]]
 end
 
-local function CreateMTStyle(self, unit, isSingle)
-    self.mystyle = "failMT"
-    self:SetSize(150, 29)
-    -- Generate Bars
-    lib.gen_hpbar(self)
-    lib.gen_hpstrings(self)
-    lib.gen_highlight(self)
-    lib.gen_ppbar(self)
-    lib.gen_RaidMark(self)
-    lib.ReadyCheck(self)
-    lib.createDebuffs(self)
-    self.Health.frequentUpdates = false
-    self.Health.colorClass = true
-
+-- The Shared Style Function
+local GlobalStyle = function(self, unit, isSingle)
+        
+        self.menu = lib.spawnMenu
+        self:RegisterForClicks('AnyDown')
+        
+        -- Call Unit Specific Styles
+        if (UnitSpecific[unit]) then
+            return UnitSpecific[unit](self)
+        end
 end
 
-local function CreateArenaStyle(self, unit, isSingle)
-    self.mystyle = "failArena"
-    self.Range = {
-        insideAlpha = 1,
-        outsideAlpha = .3,
-    }
-    
-    -- Size and Scale
-    self:SetSize(150, 29)
-    
-    -- Generate Bars
-    lib.gen_hpbar(self)
-    lib.gen_hpstrings(self)
-    lib.gen_highlight(self)
-    lib.gen_ppbar(self)
-    lib.gen_RaidMark(self)
-    
-    --style specific stuff
-    self.Health.frequentUpdates = true
-    self.Health.colorSmooth = true
-    --self.Health.Smooth = true
-    self.Power.frequentUpdates = true
-    self.Power.Smooth = true
-    self.Power.colorHealth = true
-    self.Power.colorClass = true
-    self.Power.bg.multiplier = 0.5
-    lib.gen_castbar(self)
-    lib.gen_mirrorcb(self)
-    
-    lib.createBuffs(self)
-    lib.createDebuffs(self)
-
+-- The Shared Style Function for Party and Raid
+local GroupGlobalStyle = function(self, unit)
+        
+        self.menu = lib.spawnMenu
+        self:RegisterForClicks('AnyDown')
+        
+        -- Call Unit Specific Styles
+        if (UnitSpecific[unit]) then
+            return UnitSpecific[unit](self)
+        end
 end
 
 -----------------------------
 -- SPAWN UNITS
 -----------------------------
 oUF:RegisterStyle('fail', GlobalStyle)
-oUF:RegisterStyle('failPet', CreatePetStyle)
-oUF:RegisterStyle('failParty', CreatePartyStyle)
-oUF:RegisterStyle('raid', CreateRaidStyle)
-oUF:RegisterStyle('failMT', CreateMTStyle)
-oUF:RegisterStyle('failArena', CreateArenaStyle)
-oUF:RegisterStyle('failBoss', CreateBossStyle)
+oUF:RegisterStyle('failGroup', GroupGlobalStyle)
 
 oUF:Factory(function(self)
         -- Single Frames
@@ -520,81 +457,102 @@ oUF:Factory(function(self)
         self:Spawn('player'):SetPoint("CENTER", UIParent, cfg.PlayerRelativePoint, cfg.PlayerX, cfg.PlayerY)
         self:Spawn('target'):SetPoint("CENTER", UIParent, cfg.TargetRelativePoint, cfg.TargetX, cfg.TargetY)
         if cfg.showtot then self:Spawn('targettarget'):SetPoint("BOTTOMLEFT", oUF_failTarget, cfg.TotRelativePoint, cfg.TotX, cfg.TotY) end
+        if cfg.showpet then self:Spawn('pet'):SetPoint("TOPRIGHT", oUF_failPlayer, "TOPLEFT", -10, 0) end
         if cfg.showfocus then self:Spawn('focus'):SetPoint("BOTTOMRIGHT", oUF_failPlayer, cfg.FocusRelativePoint, cfg.FocusX, cfg.FocusY) end
         if cfg.showfocustarget then self:Spawn('focustarget'):SetPoint("BOTTOMLEFT", oUF_failFocus, "TOPRIGHT", cfg.FocusTargetX, cfg.FocusTargetY) end
         
-        if cfg.showpet then
-            self:SetActiveStyle("failPet")
-            local pet = self:Spawn("pet", "oUF_failPetFrame")
-            pet:SetPoint("TOPRIGHT", oUF_failPlayer, "TOPLEFT", -14, 0)
-            pet:SetScale(cfg.scale)
-        end
-        
         -- Party Frames
         if cfg.ShowParty then
-            self:SetActiveStyle('failParty')
-            local party = oUF:SpawnHeader('failParty', nil, 'custom  [group:party,nogroup:raid][@raid6,noexists,group:raid] show;hide',
-                --local party = oUF:SpawnHeader('oUF_Party', nil, "solo", "showSolo", true,  -- debug
-                "showParty", true,
-                "showPlayer", false,
-                -- 'template', 'oUF_failPartyPet',
-                --'useOwnerUnit', true,
-                "yoffset", -20,
-                "oUF-initialConfigFunction", ([[
-			self:SetWidth(%d)
-			self:SetHeight(%d)
-   		]]
-                
-                
-                
-                
-                
-                ):format(128, 26))
-            party:SetScale(cfg.partyScale)
-            party:SetPoint('BOTTOM', UIParent, 'CENTER', cfg.PartyX, cfg.PartyY)
-        else
-            oUF:DisableBlizzard 'party'
+            self:SetActiveStyle('failGroup')
+            
+            if cfg.showPartyHorizontal then
+                local party = oUF:SpawnHeader('oUF_Party', nil, 'custom  [group:party,nogroup:raid][@raid6,noexists,group:raid] show;hide',
+                    --local party = oUF:SpawnHeader('oUF_Party', nil, "solo", "showSolo", true,  -- debug
+                    "showParty", cfg.ShowParty,
+                    "showPlayer", cfg.ShowSelfParty,
+                    "yoffset", -15,
+                    "sortMethod", "INDEX",
+                    "maxColumns", 5,
+                    "unitsPerColumn", 1,
+                    "columnSpacing", 9,
+                    "point", "TOP",
+                    "columnAnchorPoint", "LEFT",
+                    "oUF-initialConfigFunction", ([[
+				self:SetWidth(%d)
+				self:SetHeight(%d)
+			]] ):format(128, 25))
+                party:SetScale(cfg.raidScale)
+                party:SetPoint('CENTER', UIParent, 'CENTER', cfg.PartyX, cfg.PartyY)
+            else
+                local party = oUF:SpawnHeader('oUF_Party', nil, 'custom  [group:party,nogroup:raid][@raid6,noexists,group:raid] show;hide',
+                    --local party = oUF:SpawnHeader('oUF_Party', nil, "solo", "showSolo", true,  -- debug
+                    "showParty", cfg.ShowParty,
+                    "showPlayer", cfg.ShowSelfParty,
+                    "yoffset", -15,
+                    "oUF-initialConfigFunction", ([[
+				self:SetWidth(%d)
+				self:SetHeight(%d)
+			]]):format(128, 25))
+                party:SetScale(cfg.raidScale)
+                party:SetPoint('CENTER', UIParent, 'CENTER', cfg.PartyX, cfg.PartyY)
+            end
         end
         
         -- Raid Frames
         if cfg.ShowRaid then
-            self:SetActiveStyle('raid')
             
-            local raid25 = oUF:SpawnHeader("oUF_Raid", nil, "custom show; [@raid6,exists] show; hide", -- Raid frames for 6-25 players.
+            self:SetActiveStyle('failGroup')
+            local raid10 = oUF:SpawnHeader("oUF_Raid10", nil, "custom [@raid11,exists] hide; [@raid6,exists] show; hide", -- Raid frames for 6-10 players.
                 "showRaid", cfg.ShowRaid,
                 "showSolo", false,
                 "showPlayer", true,
                 "showParty", false,
                 "xoffset", 9,
-                "yOffset", -8,
+                "yOffset", -10,
                 "groupFilter", "1,2,3,4,5,6,7,8",
                 "groupBy", "GROUP",
                 "groupingOrder", "1,2,3,4,5,6,7,8",
                 "sortMethod", "INDEX",
-                "maxColumns", 8,
+                "maxColumns", 2,
                 "unitsPerColumn", 5,
-                "columnSpacing", 12,
+                "columnSpacing", 9,
                 "point", "TOP",
-                "columnAnchorPoint", "RIGHT",
+                "columnAnchorPoint", "LEFT",
                 "oUF-initialConfigFunction", ([[
 		self:SetWidth(%d)
 		self:SetHeight(%d)
-		]]
-                
-                
-                
-                
-                
-                ):format(75, 25))
-            --raid25:SetScale(cfg.raidScale)
-            raid25:SetPoint('TOPLEFT', UIParent, 'TOPLEFT', cfg.RaidX, cfg.RaidY)
+		]] ):format(96, 25))
+            raid10:SetScale(cfg.raidScale)
+            raid10:SetPoint('CENTER', UIParent, 'CENTER', cfg.RaidX + 200, cfg.RaidY + 100)
             
-            local raid40 = oUF:SpawnHeader("oUF_Raid", nil, "custom [@raid26,exists] hide; hide", -- Raid frames for 26-40 players.
+            local raid25 = oUF:SpawnHeader("oUF_Raid25", nil, "custom [@raid26,exists] hide; [@raid11,exists] show; hide", -- Raid frames for 11-25 players.
                 "showRaid", cfg.ShowRaid,
                 "showPlayer", true,
                 "showParty", false,
                 "xoffset", 9,
-                "yOffset", -8,
+                "yOffset", -10,
+                "groupFilter", "1,2,3,4,5",
+                "groupBy", "GROUP",
+                "groupingOrder", "1,2,3,4,5",
+                "sortMethod", "INDEX",
+                "maxColumns", 5,
+                "unitsPerColumn", 5,
+                "columnSpacing", 9,
+                "point", "TOP",
+                "columnAnchorPoint", "LEFT",
+                "oUF-initialConfigFunction", ([[
+		self:SetWidth(%d)
+		self:SetHeight(%d)
+		]] ):format(80, 25))
+            raid25:SetScale(cfg.raidScale)
+            raid25:SetPoint('CENTER', UIParent, 'CENTER', cfg.RaidX + 80, cfg.RaidY)
+            
+            local raid40 = oUF:SpawnHeader("oUF_Raid40", nil, "custom [@raid26,exists] show; hide", -- Raid frames for 26-40 players.
+                "showRaid", cfg.ShowRaid,
+                "showPlayer", true,
+                "showParty", false,
+                "xoffset", 9,
+                "yOffset", -10,
                 "groupFilter", "1,2,3,4,5,6,7,8",
                 "groupBy", "GROUP",
                 "groupingOrder", "1,2,3,4,5,6,7,8",
@@ -603,133 +561,28 @@ oUF:Factory(function(self)
                 "unitsPerColumn", 5,
                 "columnSpacing", 9,
                 "point", "TOP",
-                "columnAnchorPoint", "RIGHT",
+                "columnAnchorPoint", "LEFT",
                 "oUF-initialConfigFunction", ([[
 		self:SetWidth(%d)
 		self:SetHeight(%d)
-		]]
-                
-                
-                
-                
-                
-                ):format(50, 25))
+		]] ):format(64, 25))
             --raid40:SetScale(cfg.raidScale)
-            raid40:SetPoint('CENTER', UIParent, 'CENTER', cfg.RaidX + 135, cfg.RaidY)
-        
-        end
-        
-        -- Main Tank Frames
-        if cfg.showMTFrames then
-            self:SetActiveStyle('failMT')
-            local tank = oUF:SpawnHeader('oUF_MT', nil, 'raid',
-                'oUF-initialConfigFunction', ([[
-				self:SetWidth(%d)
-				self:SetHeight(%d)
-			]]
-                
-                
-                
-                
-                
-                ):format(80, 22),
-                'showRaid', true,
-                'groupFilter', 'MAINTANK',
-                'yOffset', 8,
-                'point', 'BOTTOM',
-                'template', 'oUF_MainTank')
-            tank:SetPoint("TOP", UIParent, "TOP", cfg.TankX, cfg.TankY)
-        end
-        
-        -- Boss Frames
-        if cfg.showBossFrames then
-            self:SetActiveStyle('failBoss')
-            local boss = {}
-            for i = 1, MAX_BOSS_FRAMES do
-                boss[i] = self:Spawn("boss" .. i, "oUF_Boss" .. i)
-                if i == 1 then
-                    boss[i]:SetPoint("CENTER", UIParent, "CENTER", cfg.BossX, cfg.BossY)
-                else
-                    boss[i]:SetPoint("BOTTOMRIGHT", boss[i - 1], "BOTTOMRIGHT", 0, 60)
-                end
-            end
-        end
-        
-        -- Arena Frames
-        if cfg.showArenaFrames then
-            self:SetActiveStyle('failArena')
-            
-            local arena = {}
-            for i = 1, 5 do
-                arena[i] = self:Spawn("arena" .. i, "oUF_Arena" .. i)
-                if i == 1 then
-                    arena[i]:SetPoint("BOTTOMRIGHT", UIParent, "TOPRIGHT", cfg.BossX, cfg.BossY)
-                else
-                    arena[i]:SetPoint("BOTTOMRIGHT", arena[i - 1], "BOTTOMRIGHT", 0, 90)
-                end
-                arena[i]:SetSize(150, 30)
-            end
-            
-            local FailPrepArena = {}
-            for i = 1, 5 do
-                FailPrepArena[i] = CreateFrame("Frame", "FailPrepArena" .. i, UIParent)
-                FailPrepArena[i]:SetAllPoints(arena[i])
-                FailPrepArena[i]:SetBackdropColor(0, 0, 0)
-                --CreateShadow(FailPrepArena[i])
-                FailPrepArena[i].Health = CreateFrame("StatusBar", nil, FailPrepArena[i])
-                FailPrepArena[i].Health:SetAllPoints()
-                FailPrepArena[i].Health:SetStatusBarTexture(cfg.statusbar_texture)
-                FailPrepArena[i].Health:SetStatusBarColor(.3, .3, .3, 1)
-                FailPrepArena[i].SpecClass = FailPrepArena[i].Health:CreateFontString(nil, "OVERLAY")
-                FailPrepArena[i].SpecClass:SetFont(cfg.font, 9, "OUTLINE")
-                FailPrepArena[i].SpecClass:SetPoint("CENTER")
-                FailPrepArena[i]:Hide()
-            end
-            
-            local ArenaListener = CreateFrame("Frame", "FailArenaListener", UIParent)
-            ArenaListener:RegisterEvent("PLAYER_ENTERING_WORLD")
-            ArenaListener:RegisterEvent("ARENA_PREP_OPPONENT_SPECIALIZATIONS")
-            ArenaListener:RegisterEvent("ARENA_OPPONENT_UPDATE")
-            ArenaListener:SetScript("OnEvent", function(self, event)
-                if event == "ARENA_OPPONENT_UPDATE" then
-                    for i = 1, 5 do
-                        local f = _G["FailPrepArena" .. i]
-                        f:Hide()
-                    end
-                else
-                    local numOpps = GetNumArenaOpponentSpecs()
-                    
-                    if numOpps > 0 then
-                        for i = 1, 5 do
-                            local f = _G["FailPrepArena" .. i]
-                            local s = GetArenaOpponentSpec(i)
-                            local _, spec, class = nil, "UNKNOWN", "UNKNOWN"
-                            
-                            if s and s > 0 then
-                                _, spec, _, _, _, _, class = GetSpecializationInfoByID(s)
-                            end
-                            
-                            if (i <= numOpps) then
-                                if class and spec then
-                                    f.SpecClass:SetText(spec .. "  -  " .. LOCALIZED_CLASS_NAMES_MALE[class])
-                                    
-                                    local color = arena[i].colors.class[class]
-                                    f.Health:SetStatusBarColor(unpack(color))
-                                    
-                                    f:Show()
-                                end
-                            else
-                                f:Hide()
-                            end
-                        end
-                    else
-                        for i = 1, 5 do
-                            local f = _G["FailPrepArena" .. i]
-                            f:Hide()
-                        end
-                    end
-                end
-            end)
+            raid40:SetPoint('CENTER', UIParent, 'CENTER', cfg.RaidX, cfg.RaidY)
         
         end
 end)
+
+--spawn the Boss Frames by Screamie
+-----------------------------------
+if cfg.showBossFrames then
+    oUF:RegisterStyle("oUF_failBoss", CreateUnitFrame)
+    oUF:SetActiveStyle("oUF_failBoss")
+    local boss1 = oUF:Spawn("boss1", "oUF_Boss1")
+    boss1:SetPoint("BOTTOMRIGHT", UIParent, "TOPRIGHT", cfg.BossX, cfg.BossY)
+    local boss2 = oUF:Spawn("boss2", "oUF_Boss2")
+    boss2:SetPoint("BOTTOMRIGHT", UIParent, "TOPRIGHT", cfg.BossX, cfg.BossY - 70)
+    local boss3 = oUF:Spawn("boss3", "oUF_Boss3")
+    boss3:SetPoint("BOTTOMRIGHT", UIParent, "TOPRIGHT", cfg.BossX, cfg.BossY - 140)
+    local boss4 = oUF:Spawn("boss4", "oUF_Boss4")
+    boss4:SetPoint("BOTTOMRIGHT", UIParent, "TOPRIGHT", cfg.BossX, cfg.BossY - 210)
+end

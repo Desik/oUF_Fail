@@ -11,18 +11,20 @@ local mediaFolder = "Interface\\AddOns\\oUF_Fail\\media\\" -- don't touch this .
 -- Units
 cfg.showtot = true -- show target of target frame
 cfg.showpet = true -- show pet frame
-cfg.showpartypet = false -- show party pet frame
 cfg.showfocus = true -- show focus frame
 cfg.showfocustarget = true -- show focus target frame
 cfg.ShowPlayerName = true -- show player's name and level
 cfg.ShowExtraUnitArrows = true -- show power arrows on additional frames (target, focus, focus target)
 cfg.showBossFrames = true -- show boss frame
-cfg.showMTFrames = false -- show main tank frame - not yet working
 
 -- Raid and Party
 cfg.ShowParty = true -- show party frames
-cfg.party_leader_icon = true -- Show Leader Icon
+cfg.ShowSelfParty = true -- show self in party
+cfg.party_leader_icon = false -- Show Leader Icon
+cfg.showPartyHorizontal = false -- shows party frames horizontally
+
 cfg.ShowRaid = true -- show raid frames
+cfg.RaidShowSolo = false -- show raid frames even when solo
 
 -- Positioning
 cfg.PlayerX = -244 -- Player frame's x-offset position from the relative point of the screen
@@ -46,8 +48,7 @@ cfg.RaidX = 6 -- Party Frames Horizontal Position
 cfg.RaidY = -6 -- Party Frames Vertical Position
 cfg.BossX = 600 -- Boss Frames Horizontal Position
 cfg.BossY = -60 -- Boss Frames Vertical Position
-cfg.TankX = 30 -- Main Tank Frames Horizontal Position
-cfg.TankY = -230 -- Main Tank Frames Vertical Position
+
 
 -- Auras
 cfg.showTargetBuffs = true -- show target buffs
@@ -58,15 +59,10 @@ cfg.showBossBuffs = true -- show target buffs
 cfg.showBossDebuffs = true -- show target debuffs
 
 -- Plugins
-cfg.enableDebuffHighlight = true -- enable *dispellable* debuff highlight for raid frames
+cfg.enableDebuffHighlight = true -- enable *dispelable* debuff highlight for raid frames
 cfg.showRaidDebuffs = true -- enable important debuff icons to show on raid units
-cfg.showAuraWatch = false -- enable display of HoTs and important player buffs/debuffs on raid frames (broken)
-cfg.CombatFeedback = false -- enable standard oUF_CombatFeedback
-cfg.FloatingCombatFeedback = true -- enable oUF_FloatingCombatFeedback by lightspark
-cfg.FountainMode = false -- enable fountain mode for oUF_CombatFeedback
 
 -- Misc
-cfg.showExperience = true -- show experience bar
 cfg.showRunebar = true -- show DK's rune bar
 cfg.showClassbar = true -- Shadow orbs, soul shards, holy power and chi
 cfg.RCheckIcon = true -- show raid check icon
@@ -76,7 +72,6 @@ cfg.showLFDIcons = true -- Show dungeon role icons in raid/party
 
 cfg.statusbar_texture = mediaFolder .. "healthbar"
 cfg.powerbar_texture = mediaFolder .. "powerbar"
-cfg.xpbar_texture = mediaFolder .. "xpbar"
 cfg.backdrop_texture = mediaFolder .. "backdrop"
 cfg.highlight_texture = mediaFolder .. "raidbg"
 cfg.debuffhighlight_texture = mediaFolder .. "debuff_highlight"
@@ -87,8 +82,7 @@ cfg.font = mediaFolder .. "Neuropol.ttf"
 cfg.healthbarfontsize = 30
 cfg.namefont = mediaFolder .. "ROADWAY.ttf"
 cfg.smallfont = mediaFolder .. "Emblem.ttf"
-cfg.raidScale = 1 -- scale factor for raid frames
-cfg.partyScale = 1 -- scale factor for party frames
+cfg.raidScale = 1 -- scale factor for raid and party frames
 cfg.scale = 1 -- scale factor for all other frames
 
 -----------------------------

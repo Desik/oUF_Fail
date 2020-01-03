@@ -31,12 +31,6 @@ local retVal = function(f, val1, val2, val3)
     end
 end
 
---status bar filling fix (from oUF_Mono)
-local fixStatusbar = function(b)
-    b:GetStatusBarTexture():SetHorizTile(false)
-    b:GetStatusBarTexture():SetVertTile(false)
-end
-
 local fixTex = function(tex)
     local ULx, ULy, LLx, LLy, URx, URy, LRx, LRy = tex:GetTexCoord()
     tex:SetTexCoord(ULy, ULx, LLy, LLx, URy, URx, LRy, LRx)
@@ -76,12 +70,6 @@ lib.gen_totemback = function(f)
     f:SetBackdropBorderColor(0, 0, 0, 0.8)
 end
 
-lib.gen_expback = function(f)
-    f:SetBackdrop(backdrop_tab);
-    f:SetBackdropColor(0, 0, 0, 0.4)
-    f:SetBackdropBorderColor(0, 0, 0, 0.8)
-end
-
 lib.gen_classback = function(f)
     f:SetBackdrop(backdrop_tab);
     f:SetBackdropColor(0, 0, 0, 0.2)
@@ -89,12 +77,12 @@ lib.gen_classback = function(f)
 end
 
 -- Right Click Menu
-lib.menu = function(self)
+lib.spawnMenu = function(self)
     local unit = self.unit:sub(1, -2)
-    local cunit = self.unit:gsub("(.)", string.upper, 1)
+    local cunit = self.unit:gsub("^%l", string.upper)
     
-    if (cunit == 'Vehicle') then
-        cunit = 'Pet'
+    if (cunit == "Vehicle") then
+        cunit = "Pet"
     end
     
     if (unit == "party") then
@@ -115,15 +103,11 @@ lib.gen_fontstring = function(f, name, size, outline)
     fs:SetFont(name, size, outline)
     fs:SetShadowColor(0, 0, 0, 0.8)
     fs:SetShadowOffset(1, -1)
-    fs:SetWordWrap(disable)
-    --fs.frequentUpdates = true
     return fs
 end
 
 --gen healthbar func
 lib.gen_hpbar = function(f)
-        -- local unit = f.__owner.unit
-        -- local class, classFileName = UnitClass("player")
         --statusbar
         local s = CreateFrame("StatusBar", nil, f)
         s:SetStatusBarTexture(cfg.statusbar_texture)
@@ -143,19 +127,6 @@ lib.gen_hpbar = function(f)
         b:SetTexture(cfg.statusbar_texture)
         b:SetAllPoints(s)
         b:SetVertexColor(1, 0.1, 0.1, 0.8)
-        --[[ Smooth updating player health text test
-        if f.mystyle == "player" then
-        local text = lib.gen_fontstring(f.Health, cfg.font, 36, "THINOUTLINE")
-        text:SetPoint("RIGHT", f.Health, "RIGHT", 2, -4)
-        text:SetJustifyH("RIGHT")
-        s.text = text
-        s.PostUpdate = function(self, unit, value, maxvalue, minvalue)
-        local color = RAID_CLASS_COLORS[classFileName]
-        local r, g, b = (class, color.r, color.g, color.b)
-        self.text:SetFormattedText("|cff%02x%02x%02x%d", r * 255, g * 255, b * 255, value)
-        end
-        else
-        end]]
         f.Health = s
         f.Health.bg2 = b
 end
@@ -169,8 +140,7 @@ lib.gen_hpstrings = function(f, unit)
         local fontsize
         if f.mystyle == "player" then fontsize = cfg.healthbarfontsize
         elseif f.mystyle == "target" then fontsize = 15
-        elseif f.mystyle == "party" then fontsize = 15
-        elseif f.mystyle == "raid" then fontsize = 12
+        elseif f.mystyle == "raid" or f.mystyle == "party" then fontsize = 18
         else fontsize = 16
         end
         
@@ -181,9 +151,6 @@ lib.gen_hpstrings = function(f, unit)
         elseif f.mystyle == "raid" or f.mystyle == "party" then
             name:SetPoint("LEFT", f.Health, "LEFT", 0, 4)
             name:SetJustifyH("LEFT")
-        elseif f.mystyle == "pet" or f.mystyle == "partypet" then
-            name:SetPoint("LEFT", f.Health, "TOPLEFT", 2, -4)
-            name:SetJustifyH("LEFT")
         else
             name:SetPoint("LEFT", f.Health, "TOPLEFT", 6, -1)
             name:SetJustifyH("LEFT")
@@ -193,10 +160,7 @@ lib.gen_hpstrings = function(f, unit)
         if f.mystyle == "player" then
             hpval:SetPoint("RIGHT", f.Health, "RIGHT", 2, -6)
             hpval:SetJustifyH("RIGHT")
-        elseif f.mystyle == "party" or f.mystyle == "pet" or f.mystyle == "partypet" then
-            hpval:SetPoint("RIGHT", f.Health, "RIGHT", 6, -8)
-            hpval:SetJustifyH("LEFT")
-        elseif f.mystyle == "raid" then
+        elseif f.mystyle == "raid" or f.mystyle == "party" then
             hpval:SetPoint("RIGHT", f.Health, "RIGHT", 5, -6)
             hpval:SetJustifyH("RIGHT")
         elseif f.mystyle == "focus" or f.mystyle == "focustarget" then
@@ -208,7 +172,10 @@ lib.gen_hpstrings = function(f, unit)
         
         if f.mystyle == "player" then
             name:SetPoint("RIGHT", f, "RIGHT", 10, 6)
-        elseif f.mystyle == "target" or f.mystyle == "pet" or f.mystyle == "partypet" then
+            
+        elseif f.mystyle == "raid" or f.mystyle == "party" then
+            name:SetPoint("CENTER", f, "CENTER", 0, 6)
+        elseif f.mystyle == "target" or f.mystyle == "pet" then
             name:SetPoint("RIGHT", f, "RIGHT", 0, -12)
         else
             name:SetPoint("RIGHT", f, "RIGHT", 0, 0)
@@ -288,19 +255,6 @@ lib.gen_ppbar = function(f)
                         text:SetFormattedText("|cff%02x%02x%02x%d", r * 255, g * 255, b * 255, value)
                     end
                 end)
-            
-            --[[local text = lib.gen_fontstring(f.Health, cfg.font, 18, "OUTLINE")
-            text:SetPoint("RIGHT", s.arrow, "LEFT", 6, -8)
-            
-            s.text = text
-            s.PostUpdate = function(self, unit, value, maxvalue, minvalue)
-            local r, g, b = s:GetStatusBarColor()
-            if (value >= 1e3) then
-            self.text:SetFormattedText("|cff%02x%02x%02x%.1fk", r * 255, g * 255, b * 255, value / 1e3)
-            else
-            self.text:SetFormattedText("|cff%02x%02x%02x%d", r * 255, g * 255, b * 255, value)
-            end
-            end ]]
             else
                 --==regular power text for everyone else==--
                 local powertext = lib.gen_fontstring(f.Health, cfg.font, 18, "OUTLINE")
@@ -309,7 +263,7 @@ lib.gen_ppbar = function(f)
                 f:Tag(powertext, "[fail:pp]")
             end
             --==No arrows for raid and boss==--
-            if f.mystyle ~= "raid" and f.mystyle ~= "failBoss" then
+            if f.mystyle ~= "raid" and f.mystyle ~= "boss" then
                 f:Tag(powa, "[fail:pp]")
             end
             
@@ -440,13 +394,13 @@ end
 
 -- Create Target Border
 function lib.CreateTargetBorder(self)
-
-    self.TargetBorder = self.Health:CreateTexture("BACKGROUND", nil, self)
-    self.TargetBorder:SetPoint("TOPLEFT", self.Health, "TOPLEFT", -24, 24)
-    self.TargetBorder:SetPoint("BOTTOMRIGHT", self.Health, "BOTTOMRIGHT", 24, -24)
-    self.TargetBorder:SetTexture([[Interface\Addons\oUF_Fail\media\target]])
-    self.TargetBorder:SetVertexColor(1.0, 1.0, 0.1, 0.6)
-    self.TargetBorder:SetBlendMode("ADD")
+    local glowBorder = {edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = 2}
+    self.TargetBorder = CreateFrame("Frame", nil, self)
+    self.TargetBorder:SetPoint("TOPLEFT", self.Health, "TOPLEFT", -4, 4)
+    self.TargetBorder:SetPoint("BOTTOMRIGHT", self.Health, "BOTTOMRIGHT", 5, -8)
+    self.TargetBorder:SetBackdrop(glowBorder)
+    self.TargetBorder:SetFrameLevel(2)
+    self.TargetBorder:SetBackdropBorderColor(1.0, 1.0, 0.1, 0.6)
     self.TargetBorder:Hide()
 end
 
@@ -518,6 +472,7 @@ lib.gen_castbar = function(f)
     local cbColor = {95 / 255, 182 / 255, 255 / 255}
     local s = CreateFrame("StatusBar", "oUF_failCastbar" .. f.mystyle, f)
     s:SetHeight(16)
+    --s:SetWidth(f:GetWidth() - 30)
     if f.mystyle == "focus" then
         s:SetWidth(f:GetWidth() * 2 - 14)
     elseif f.mystyle == "player" then
@@ -589,7 +544,7 @@ lib.gen_castbar = function(f)
         l:SetJustifyH("RIGHT")
         l:Hide()
         s.Lag = l
-        --  f:RegisterEvent("UNIT_SPELLCAST_SENT", cast.OnCastSent)	--removed with 8.0
+    --  f:RegisterEvent("UNIT_SPELLCAST_SENT", cast.OnCastSent)	--removed with 8.0
     end
     s.OnUpdate = cast.OnCastbarUpdate
     s.PostCastStart = cast.PostCastStart
@@ -672,7 +627,7 @@ local myPostCreateIcon = function(self, button)
         h:SetFrameLevel(0)
         h:SetPoint("TOPLEFT", -5, 5)
         h:SetPoint("BOTTOMRIGHT", 5, -5)
-        lib.gen_expback(h)
+        lib.gen_backdrop(h)
 end
 
 -- Post Update Icon Function
@@ -692,8 +647,8 @@ local myPostUpdateIcon = function(self, unit, icon, index, offset, filter, isDeb
         
         -- Desaturate non-Player Debuffs
         if (icon.isDebuff) then
-        if (unit == "target") then
-            
+            if (unit == "target") then
+                
                 if (unitCaster == 'player' or unitCaster == 'vehicle') then
                     icon.icon:SetDesaturated(false)
                 elseif (not UnitPlayerControlled(unit)) then -- If Unit is Player Controlled don't desaturate debuffs
@@ -853,19 +808,39 @@ lib.PostUpdateRaidFrame = function(Health, unit, min, max)
         end
 end
 
--- runebar
+-- Class specific powers
+lib.gen_AltPowerBar = function(self)
+        
+        local AdditionalPower = CreateFrame("StatusBar", "AdditionalPowerBar", self.Power)
+        AdditionalPower:SetHeight(6)
+        AdditionalPower:SetWidth(self.Power:GetWidth() - 20)
+        AdditionalPower:SetPoint("TOP", self.Health, "BOTTOM", 0, -1)
+        AdditionalPower:SetFrameLevel(1)
+        AdditionalPower:SetStatusBarTexture(cfg.statusbar_texture)
+        AdditionalPower:SetStatusBarColor(.117, .55, 1)
+        
+        AdditionalPower.bg = AdditionalPower:CreateTexture(nil, "BORDER")
+        AdditionalPower.bg:SetTexture(cfg.statusbar_texture)
+        AdditionalPower.bg:SetVertexColor(.05, .15, .4)
+        AdditionalPower.bg:SetPoint("TOPLEFT", AdditionalPower, "TOPLEFT", 0, 0)
+        AdditionalPower.bg:SetPoint("BOTTOMRIGHT", AdditionalPower, "BOTTOMRIGHT", 0, 0)
+        
+        local h = CreateFrame("Frame", nil, AdditionalPower)
+        h:SetFrameLevel(0)
+        h:SetPoint("TOPLEFT", -4, 4)
+        h:SetPoint("BOTTOMRIGHT", 4, -4)
+        lib.gen_backdrop(h)
+        self.AdditionalPower = AdditionalPower
+        self.AdditionalPower.bg = AdditionalPower.bg
+end
+
+-- Runebar
 lib.genRunes = function(self)
     if playerClass ~= "DEATHKNIGHT" then return end
     local Runes = CreateFrame("Frame", nil, self)
     Runes:SetPoint('CENTER', self.Health, 'TOP', 2, 1)
     Runes:SetHeight(8)
     Runes:SetWidth(self.Health:GetWidth())
-    
-    -- local pad
-    -- if (IsAddOnLoaded('oUF_Experience') or IsAddOnLoaded('oUF_Reputation')) then pad = -8
-    -- else
-    --     pad = 0
-    -- end
     
     for i = 1, 6 do
         Runes[i] = CreateFrame("StatusBar", self:GetName() .. "_Runes" .. i, self)
@@ -894,39 +869,6 @@ lib.genRunes = function(self)
     end
     
     self.Runes = Runes
-end
-
--- Class specific powers
-lib.gen_AltPowerBar = function(self)
-        
-        -- local pad
-        -- if (IsAddOnLoaded('oUF_Experience') or IsAddOnLoaded('oUF_Reputation')) then pad = -8
-        -- else
-        --     pad = 0
-        -- end
-        
-        local AdditionalPower = CreateFrame("StatusBar", "AdditionalPowerBar", self.Power)
-        AdditionalPower:SetHeight(6)
-        AdditionalPower:SetWidth(self.Power:GetWidth() - 20)
-        AdditionalPower:SetPoint("TOP", self.Health, "BOTTOM", 0, -1)
-        AdditionalPower:SetFrameLevel(1)
-        AdditionalPower:SetStatusBarTexture(cfg.statusbar_texture)
-        AdditionalPower:SetStatusBarColor(.117, .55, 1)
-        
-        AdditionalPower.bg = AdditionalPower:CreateTexture(nil, "BORDER")
-        AdditionalPower.bg:SetTexture(cfg.statusbar_texture)
-        AdditionalPower.bg:SetVertexColor(.05, .15, .4)
-        AdditionalPower.bg:SetPoint("TOPLEFT", AdditionalPower, "TOPLEFT", 0, 0)
-        AdditionalPower.bg:SetPoint("BOTTOMRIGHT", AdditionalPower, "BOTTOMRIGHT", 0, 0)
-        
-        local h = CreateFrame("Frame", nil, AdditionalPower)
-        h:SetFrameLevel(0)
-        h:SetPoint("TOPLEFT", -4, 4)
-        h:SetPoint("BOTTOMRIGHT", 4, -4)
-        lib.gen_classback(h)
-        
-        self.DruidMana = AdditionalPower
-        self.DruidMana.bg = AdditionalPower.bg
 end
 
 -- Class Power
@@ -1211,7 +1153,7 @@ lib.HealPred = function(self)
     ohpb:SetStatusBarTexture(cfg.statusbar_texture)
     ohpb:SetStatusBarColor(1, 1, 1, 0.4)
     mhpb:SetFrameLevel(1)
-    self.HealPrediction = {
+    self.HealthPrediction = {
         myBar = mhpb,
         otherBar = ohpb,
         maxOverflow = 1,
@@ -1219,7 +1161,6 @@ lib.HealPred = function(self)
 end
 
 -- Addons/Plugins -------------------------------------------
-
 -- oUF_DebuffHighlight
 lib.debuffHighlight = function(self)
     if cfg.enableDebuffHighlight then
@@ -1235,22 +1176,63 @@ lib.debuffHighlight = function(self)
 end
 
 -- oUF_CombatFeedback
-lib.gen_combat_feedback = function(self)
-    if IsAddOnLoaded("oUF_CombatFeedback") and cfg.CombatFeedback then
-        local h = CreateFrame("Frame", nil, self.Health)
-        h:SetAllPoints(self.Health)
+lib.gen_combat_feedback = function(f)
+    if IsAddOnLoaded("oUF_CombatFeedback") then
+        local h = CreateFrame("Frame", nil, f.Health)
+        h:SetAllPoints(f.Health)
         h:SetFrameLevel(30)
         local cfbt = lib.gen_fontstring(h, cfg.font, 18, "THINOUTLINE")
-        cfbt:SetPoint("CENTER", self.Health, "BOTTOM", 0, -1)
+        cfbt:SetPoint("CENTER", f.Health, "BOTTOM", 0, -1)
         cfbt.maxAlpha = 0.75
         cfbt.ignoreEnergize = true
-        self.CombatFeedbackText = cfbt
+        f.CombatFeedbackText = cfbt
     end
 end
 
+-- oUF_WeaponEnchant (temporary weapon enchant icon)
+local function WeapEnchantIcon(self, icon, icons)
+    local iconwidth = icon:GetWidth()
+    icon.time = icon:CreateFontString(nil, 'OVERLAY')
+    icon.time:SetFont(cfg.font, iconwidth / 2.6, 12)
+    icon.time:SetPoint("BOTTOM", icon, 0, -2)
+    icon.time:SetJustifyH('CENTER')
+    icon.time:SetVertexColor(1.0, 0.8, 0.1)
+    
+    icon.overlay:SetTexture("Interface\\AddOns\\oUF_Fail\\media\\iconborder.tga")
+    icon.overlay:SetTexCoord(0, 1, 0, 1)
+    icon.overlay:SetVertexColor(0, 0, 0, 0.9)
+    
+    icon.icon:SetTexCoord(.08, .92, .08, .92)
 
+end
 
-
+    local CreateEnchantTimer = function(self, icons)
+        for i = 1, 2 do
+            local icon = icons[i]
+            if icon.expTime then
+                icon.timeLeft = icon.expTime - GetTime()
+                icon.time:Show()
+            else
+                icon.time:Hide()
+            end
+            icon:SetScript("OnUpdate", CreateAuraTimer)
+        end
+    end
+    
+    lib.gen_WeaponEnchant = function(self)
+        if IsAddOnLoaded("oUF_WeaponEnchant") then
+            self.Enchant = CreateFrame("Frame", nil, self)
+            self.Enchant:SetSize(64, 32)
+            self.Enchant:SetPoint("TOPRIGHT", oUF_failPlayer.Power, "BOTTOMLEFT", 0, 0)
+            self.Enchant.size = 32
+            self.Enchant.spacing = 2
+            self.Enchant.initialAnchor = "TOPRIGHT"
+            self.Enchant["growth-x"] = "LEFT"
+            self.Enchant:SetFrameLevel(10)
+            self.PostCreateEnchantIcon = WeapEnchantIcon
+            self.PostUpdateEnchantIcons = CreateEnchantTimer
+        end
+    end
 
 -- Power Bar Arrow Function
 -- Special thanks to Zork and Rainrider for the initial implementation
@@ -1302,80 +1284,6 @@ function AltPowerBarPostUpdate(self, min, cur, max)
     end
     local unit = self:GetParent().unit or self:GetParent():GetParent().unit
     local type = select(10, UnitAlternatePowerInfo(unit))
-end
-
--- AuraWatch
-local AWPostCreateIcon = function(AWatch, icon, spellID, name, self)
-    icon.cd:SetReverse()
-    local count = lib.gen_fontstring(icon, cfg.smallfont, 12, "OUTLINE")
-    count:SetPoint("CENTER", icon, "BOTTOM", 3, 3)
-    icon.count = count
-    local h = CreateFrame("Frame", nil, icon)
-    h:SetFrameLevel(4)
-    h:SetPoint("TOPLEFT", -3, 3)
-    h:SetPoint("BOTTOMRIGHT", 3, -3)
-    lib.gen_backdrop(h)
-end
-lib.createAuraWatch = function(self, unit)
-    if cfg.showAuraWatch then
-        local auras = {}
-        local spellIDs = {
-            DEATHKNIGHT = {
-            },
-            DRUID = {
-                33763, -- Lifebloom
-                8936, -- Regrowth
-                774, -- Rejuvenation
-                48438, -- Wild Growth
-            },
-            HUNTER = {
-                34477, -- Misdirection
-            },
-            MAGE = {
-            },
-            PALADIN = {
-                53563, -- Beacon of Light
-                25771, -- Forbearance
-            },
-            PRIEST = {
-                17, -- Power Word: Shield
-                139, -- Renew
-                33076, -- Prayer of Mending
-                6788, -- Weakened Soul
-            },
-            ROGUE = {
-                57934, -- Tricks of the Trade
-            },
-            SHAMAN = {
-                974, -- Earth Shield
-                61295, -- Riptide
-            },
-            WARLOCK = {
-                20707, -- Soulstone Resurrection
-            },
-            WARRIOR = {
-            },
-        }
-        
-        auras.onlyShowPresent = true
-        auras.anyUnit = true
-        auras.PostCreateIcon = AWPostCreateIcon
-        -- Set any other AuraWatch settings
-        auras.icons = {}
-        
-        for i, sid in pairs(spellIDs[playerClass]) do
-            local icon = CreateFrame("Frame", nil, self)
-            icon.spellID = sid
-            -- set the dimensions and positions
-            icon:SetWidth(14)
-            icon:SetHeight(14)
-            icon:SetFrameLevel(5)
-            icon:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", 12 * i, 5)
-            
-            auras.icons[sid] = icon
-        end
-        self.AuraWatch = auras
-    end
 end
 
 

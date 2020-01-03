@@ -4,8 +4,8 @@
 ## Version: 2.0 (2020.01.01)
 ## Notes: Simple Layout for oUF (a fork of oUF_Karma)
 ## RequiredDeps: oUF
-## OptionalDeps: oUF_WeaponEnchant, oUF_Experience, oUF_Reputation, oUF_CombatFeedback, oUF_FloatingCombatFeedback 
-## X-Category: UnitFrame
+## OptionalDeps: oUF_CombatFeedback
+## X-Category: UnitFrames
 
 cfg.lua
 tags.lua
@@ -16,7 +16,6 @@ Elements\DebuffHighlight.lua
 Elements\raidDebuffs.lua
 Elements\smooth.lua
 Elements\ComboPoints.lua
-##Elements\PartyPets.xml
 
 lib.lua
 core.lua

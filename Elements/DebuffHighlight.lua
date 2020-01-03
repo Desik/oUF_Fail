@@ -129,7 +129,7 @@ local function Enable(object)
     end
     
     -- make sure aura scanning is active for this object
-    object:RegisterEvent("UNIT_AURA", Update)
+    object:RegisterEvent("UNIT_AURA", Update, true)
     object:RegisterEvent("PLAYER_TALENT_UPDATE", CheckSpec, true)
     object:RegisterEvent("CHARACTER_POINTS_CHANGED", CheckSpec, true)
     CheckSpec()
@@ -151,8 +151,8 @@ end
 local function Disable(object)
     if object.DebuffHighlightBackdrop or object.DebuffHighlightBackdropBorder or object.DebuffHighlight then
         object:UnregisterEvent("UNIT_AURA", Update)
-        object:UnregisterEvent("PLAYER_TALENT_UPDATE", CheckSpec)
-        object:UnregisterEvent("CHARACTER_POINTS_CHANGED", CheckSpec)
+        object:UnregisterEvent("PLAYER_TALENT_UPDATE", CheckSpec, true)
+        object:UnregisterEvent("CHARACTER_POINTS_CHANGED", CheckSpec, true)
     end
 end
 

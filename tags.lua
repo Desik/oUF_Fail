@@ -23,15 +23,6 @@ local function hex(r, g, b)
         return ('|cff%02x%02x%02x'):format(r * 255, g * 255, b * 255)
     end
 end
-ns.colors = setmetatable({
-    power = setmetatable({
-        ['MANA'] = {0.18, 0.4, 1.0},
-        ['RAGE'] = {1.0, 0, 0},
-        ['FOCUS'] = {1.0, 0.75, 0.25},
-        ['ENERGY'] = {1.0, 0.9, 0.35},
-        ['RUNIC_POWER'] = {0.44, 0.44, 0.44},
-    }, {__index = oUF.colors.power}),
-}, {__index = oUF.colors})
 
 --something is messing up here havent sorted it out yet--
 tags.Events["fail:lfdrole"] = "GROUP_ROSTER_UPDATE PLAYER_ROLES_ASSIGNED"
@@ -43,6 +34,16 @@ tags.Methods["fail:lfdrole"] = function(unit)
         return "|cffFFF130Tank|r"
     elseif role == "DAMAGER" then
         return "|cffFF6161DPS|r"
+    end
+end
+
+tags.Events["fail:perhp"] = 'UNIT_HEALTH UNIT_MAXHEALTH'
+tags.Methods["fail:perhp"] = function(u)
+    local m = UnitHealthMax(u)
+    if (m == 0) then
+        return 0
+    else
+        return math.floor((UnitHealth(u) / m * 100 + .05) * 10) / 10
     end
 end
 
@@ -106,10 +107,11 @@ tags.Methods['fail:color'] = function(u, r)
 end
 
 tags.Events["fail:afkdnd"] = 'PLAYER_FLAGS_CHANGED UNIT_POWER_UPDATE UNIT_MAXPOWER'
-tags.Methods["fail:afkdnd"] = function(unit)        
-        return UnitIsAFK(unit) and "|cffCFCFCF <afk>|r" or UnitIsDND(unit) and "|cffCFCFCF <dnd>|r" or ""
+tags.Methods["fail:afkdnd"] = function(unit)
+    return UnitIsAFK(unit) and "|cffCFCFCF <afk>|r" or UnitIsDND(unit) and "|cffCFCFCF <dnd>|r" or ""
 end
 
+tags.Events['fail:DDG'] = 'UNIT_HEALTH'
 tags.Methods['fail:DDG'] = function(u)
     if not UnitIsConnected(u) then
         return "|cffCFCFCF D/C|r"
@@ -120,8 +122,7 @@ tags.Methods['fail:DDG'] = function(u)
     end
 end
 
-
-
+tags.Events['fail:power'] = 'UNIT_POWER_UPDATE UNIT_MAXPOWER'
 tags.Methods['fail:power'] = function(u)
     local min, max = UnitPower(u), UnitPowerMax(u)
     if min ~= max then
@@ -130,8 +131,8 @@ tags.Methods['fail:power'] = function(u)
         return SVal(max)
     end
 end
-tags.Events['fail:power'] = 'UNIT_POWER_UPDATE UNIT_MAXPOWER'
 
+tags.Events['fail:pp'] = 'UNIT_POWER_UPDATE UNIT_MAXPOWER'
 tags.Methods['fail:pp'] = function(u)
     if u == "player" or u == "target" then
         local _, class = UnitClass(u)
@@ -140,7 +141,7 @@ tags.Methods['fail:pp'] = function(u)
         end
     end
 end
-tags.Events['fail:pp'] = 'UNIT_POWER_UPDATE UNIT_MAXPOWER'
+
 
 --tags.Methods['fail:pp'] = function(u)
 --    if u == "player" then
