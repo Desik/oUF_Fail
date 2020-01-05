@@ -11,7 +11,6 @@ cfg.lua
 tags.lua
 
 Elements\castbar.lua
-Elements\AuraWatch.lua
 Elements\DebuffHighlight.lua
 Elements\raidDebuffs.lua
 Elements\smooth.lua

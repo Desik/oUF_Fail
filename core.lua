@@ -331,7 +331,6 @@ local UnitSpecific = {
             lib.HealPred(self)
             lib.debuffHighlight(self)
             lib.raidDebuffs(self)
-            lib.createAuraWatch(self, unit)
             
             self.Health.PostUpdate = lib.PostUpdateRaidFrame
             self:RegisterEvent('PLAYER_TARGET_CHANGED', lib.ChangedTarget, true)
